@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "xutility": "cpp",
+        "array": "cpp",
+        "initializer_list": "cpp",
+        "vector": "cpp",
+        "xiosbase": "cpp",
+        "xstring": "cpp",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "xfunctional": "cpp",
+        "xstddef": "cpp",
+        "xtr1common": "cpp",
+        "xlocale": "cpp"
+    }
+}
