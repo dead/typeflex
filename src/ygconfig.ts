@@ -1,5 +1,3 @@
-import {YGLogger} from './yglogger';
-
 const kYGDefaultExperimentalFeatures: Array<boolean> = [false, false, false];
 
 class YGConfig {

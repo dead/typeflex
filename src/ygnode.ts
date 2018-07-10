@@ -4,8 +4,10 @@ import {
     YGNodeType,
     YGUnit,
     YGEdge,
+    YGDimension,
     YGDimensionCount,
-    YGPositionType
+    YGPositionType,
+    YGAlign
 } from "./enums";
 import { YGFloatOptional } from "./ygfloatoptional";
 import { YGConfig } from "./ygconfig";
@@ -17,10 +19,29 @@ import {
     YGFloatMax,
     YGFlexDirectionCross,
     YGResolveFlexDirection,
-    YGValueEqual
-
+    YGValueEqual,
+    YGUnwrapFloatOptional
 } from "./utils";
+
 import { YGLayout } from "./yglayout";
+import { YGStyle } from "./ygstyle";
+import { 
+    YGVector,
+    trailing,
+    leading,
+    YGValueUndefined,
+    YGValueZero,
+    YGValueAuto,
+    kDefaultFlexGrow,
+    kDefaultFlexShrink,
+    kWebDefaultFlexShrink
+} from "./internal";
+
+import {
+    YGValue,
+    YGComputedEdgeValue,
+    YGFloatIsUndefined
+} from "./yoga";
 
 class YGNode {
     private context_: any;
@@ -41,7 +62,16 @@ class YGNode {
     private resolvedDimensions_: [YGValue, YGValue];
 
     private relativePosition(axis: YGFlexDirection, axisSize: number): YGFloatOptional {
-        
+        if (this.isLeadingPositionDefined(axis)) {
+            return this.getLeadingPosition(axis, axisSize);
+        }
+
+        let trailingPosition = this.getTrailingPosition(axis, axisSize);
+        if (!trailingPosition.isUndefined()) {
+            trailingPosition.setValue(-1 * trailingPosition.getValue());
+        }
+
+        return trailingPosition;
     }
 
     constructor(context: any,
@@ -217,7 +247,7 @@ class YGNode {
             return this.style_.border[YGEdge.Start].value;
         }
 
-        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, leading[axis], &YGValueZero).value;
+        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, leading[axis], YGValueZero).value;
         return YGFloatMax(computedEdgeValue, 0.0);
     }
 
@@ -229,7 +259,7 @@ class YGNode {
             return this.style_.border[YGEdge.End].value;
         }
 
-        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, trailing[axis], &YGValueZero).value;
+        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, trailing[axis], YGValueZero).value;
         return YGFloatMax(computedEdgeValue, 0.0);
     }
 
@@ -241,7 +271,7 @@ class YGNode {
             return paddingEdgeStart;
         }
 
-        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, leading[axis], &YGValueZero), widthSize);
+        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, leading[axis], YGValueZero), widthSize);
         return YGFloatOptionalMax(resolvedValue, new YGFloatOptional(0.0));
     }
 
@@ -253,7 +283,7 @@ class YGNode {
             return paddingEdgeEnd;
         }
 
-        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, trailing[axis], &YGValueZero), widthSize);
+        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, trailing[axis], YGValueZero), widthSize);
         return YGFloatOptionalMax(resolvedValue, new YGFloatOptional(0.0));
     }
 
@@ -291,7 +321,10 @@ class YGNode {
             this.nodeType_ = YGNodeType.Default;
         }
         else {
-            YGAssertWithNode(this, this.children_.size() == 0, "Cannot set measure function: Nodes with measure functions cannot have children.");
+            //YGAssertWithNode(this, this.children_.size() == 0, "Cannot set measure function: Nodes with measure functions cannot have children.");
+            if (this.children_.size() == 0) {
+                console.error("Cannot set measure function: Nodes with measure functions cannot have children.");
+            }
             this.measure_ = measureFunc;
             this.setNodeType(YGNodeType.Text);
         }
@@ -457,7 +490,7 @@ class YGNode {
     }
 
     resolveDimension(): void {
-        for (let dim = YGDimensionWidth; dim < YGDimensionCount; dim++) {
+        for (let dim = YGDimension.Width; dim < YGDimensionCount; dim++) {
             if (this.style_.maxDimensions[dim].unit != YGUnit.Undefined && YGValueEqual(this.style_.maxDimensions[dim], this.style_.minDimensions[dim])) {
                 this.resolvedDimensions_[dim] = this.style_.maxDimensions[dim];
             } else {
@@ -512,7 +545,7 @@ class YGNode {
 
         const cloneNodeCallback: YGCloneNodeFunc = this.config_.cloneNodeCallback;
         for (let i: number = 0; i < childCount; ++i) {
-            const oldChild: YGNode = this.children_.get(i);
+            const oldChild: YGNode = this.children_.at(i);
             let newChild: YGNode = null;
 
             if (cloneNodeCallback) {
@@ -582,7 +615,7 @@ class YGNode {
         }
 
         for (let i: number = 0; i < this.children_.size(); i++) {
-            if (this.children_.get(i).getLayout().didUseLegacyFlag) {
+            if (this.children_.at(i).getLayout().didUseLegacyFlag) {
                 didUseLegacyFlag = true;
                 break;
             }
@@ -607,7 +640,7 @@ class YGNode {
         let isLayoutTreeEqual: boolean = true;
         for (let i: number = 0; i < this.children_.size(); ++i) {
             const otherNodeChildren: YGNode = node.getChild(i);
-            isLayoutTreeEqual = this.children_.get(i).isLayoutTreeEqualToNode(otherNodeChildren);
+            isLayoutTreeEqual = this.children_.at(i).isLayoutTreeEqualToNode(otherNodeChildren);
             if (!isLayoutTreeEqual) {
                 return false;
             }

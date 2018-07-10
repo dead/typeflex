@@ -1,3 +1,7 @@
+import {
+    YGFloatIsUndefined
+} from "./yoga";
+
 class YGFloatOptional {
     private value_: number;
     private isUndefined_: boolean;

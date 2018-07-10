@@ -4,7 +4,16 @@ import {
     YGDirection
 } from './enums';
 
-import {YGFloatOptional} from './ygfloatoptional';
+import { YGFloatOptional } from './ygfloatoptional';
+
+import {
+    YGFloatIsUndefined,
+    YGValue
+} from "./yoga";
+
+import { YGNode } from "./ygnode";
+
+import { YGUndefined } from "./internal";
 
 export class YGCollectFlexItemsRowValues {
     public itemsOnline: number;
@@ -52,7 +61,7 @@ export function YGFloatOptionalMax(op1: YGFloatOptional, op2: YGFloatOptional): 
     return op1.isUndefined() ? op2 : op1;
 }
 
-export function YGFloatMin(a: number, b: number): float {
+export function YGFloatMin(a: number, b: number): number {
     if (!YGFloatIsUndefined(a) && !YGFloatIsUndefined(b)) {
         return Math.min(a, b);
     }
@@ -63,6 +72,14 @@ export function YGFloatArrayEqual(val1: Array<number>, val2: Array<number>) {
     let areEqual: boolean = true;
     for (let i = 0; i < val1.length && areEqual; ++i) {
         areEqual = YGFloatsEqual(val1[i], val2[i]);
+    }
+    return areEqual;
+}
+
+export function YGValueArrayEqual(val1: Array<YGValue>, val2: Array<YGValue>) {
+    let areEqual: boolean = true;
+    for (let i = 0; i < val1.length && areEqual; ++i) {
+        areEqual = YGValueEqual(val1[i], val2[i]);
     }
     return areEqual;
 }
