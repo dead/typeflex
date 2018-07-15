@@ -74,6 +74,10 @@ export class YGVector {
     removeIndex(index: number): void {
         this.vector.splice(index, 1);
     }
+
+    push_back(node: YGNode): void {
+        this.vector.push(node);
+    }
 }
 
 export class YGCachedMeasurement {
