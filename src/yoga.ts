@@ -4,6 +4,8 @@ import {
     YGNodeType,
     YGFlexDirection,
     YGAlign,
+    YGMeasureMode,
+    YGLogLevel
 } from "./enums";
 
 import { YGNode } from "./ygnode";
@@ -26,6 +28,27 @@ export class YGValue {
     constructor(value, unit) {
         this.value = value;
         this.unit = unit;
+    }
+}
+
+export interface YGPrintFunc { (node: YGNode): void };
+export interface YGMeasureFunc { (node: YGNode, width: number, widthMode: YGMeasureMode, height: number, heightMode: YGMeasureMode): YGSize };
+export interface YGBaselineFunc { (node: YGNode, width: number, height: number): void };
+export interface YGDirtiedFunc { (node: YGNode): void };
+export interface YGLogger { (config: YGConfig, node: YGNode, level: YGLogLevel, format: string, ...args: any[]): void };
+export interface YGCloneNodeFunc { (oldNode: YGNode, owner: YGNode, childIndex: number): YGNode };
+
+function YGDefaultLog(config: YGConfig, node: YGNode, level: YGLogLevel, format: string, ...args: any[]): void {
+    switch (level) {
+        case YGLogLevel.Error:
+        case YGLogLevel.Fatal:
+            return console.error(format, args);
+        case YGLogLevel.Warn:
+        case YGLogLevel.Info:
+        case YGLogLevel.Debug:
+        case YGLogLevel.Verbose:
+        default:
+            return console.log(format, args);
     }
 }
 
@@ -240,8 +263,8 @@ export function YGNodeReset(node: YGNode):void {
     node.clearChildren();
     const config: YGConfig = node.getConfig();
 
-    node.reset();
-
+    node.fromNode(new YGNode());
+    
     if (config.useWebDefaults) {
         node.setStyleFlexDirection(YGFlexDirection.Row);
         node.setStyleAlignContent(YGAlign.Stretch);
@@ -335,6 +358,28 @@ export function YGNodeRemoveChild(owner: YGNode, excludedChild: YGNode) : void {
         owner.removeChildIndex(nextInsertIndex);
         nextInsertIndex++;
     }
+}
+
+export function YGNodeRemoveAllChildren(owner: YGNode): void {
+    const childCount = YGNodeGetChildCount(owner);
+    if (childCount == 0) {
+      return;
+    }
+
+    const firstChild: YGNode = YGNodeGetChild(owner, 0);
+    if (firstChild.getOwner() == owner) {
+      for (let i = 0; i < childCount; i++) {
+        const oldChild: YGNode = YGNodeGetChild(owner, i);
+        oldChild.setLayout(new YGNode().getLayout());
+        oldChild.setOwner(null);
+      }
+      owner.clearChildren();
+      owner.markDirtyAndPropogate();
+      return;
+    }
+
+    owner.setChildren(new YGVector());
+    owner.markDirtyAndPropogate();
 }
 
 

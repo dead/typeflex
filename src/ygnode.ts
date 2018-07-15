@@ -40,7 +40,13 @@ import {
 import {
     YGValue,
     YGComputedEdgeValue,
-    YGFloatIsUndefined
+    YGFloatIsUndefined,
+    YGPrintFunc,
+    YGMeasureFunc,
+    YGBaselineFunc,
+    YGDirtiedFunc,
+    YGCloneNodeFunc,
+    YGNodeClone
 } from "./yoga";
 
 class YGNode {
@@ -74,24 +80,29 @@ class YGNode {
         return trailingPosition;
     }
 
-    constructor(context: any,
-                print: YGPrintFunc,
-                hasNewLayout: boolean,
-                nodeType: YGNodeType,
-                measure: YGMeasureFunc,
-                baseline: YGBaselineFunc,
-                dirtied: YGDirtiedFunc,
-                style: YGStyle,
-                layout: YGLayout,
-                lineIndex: number,
-                owner: YGNode,
-                children: YGVector,
-                nextChild: YGNode,
-                config: YGConfig,
-                isDirty: boolean,
-                resolvedDimensions: [YGValue, YGValue]
+    constructor(node?: YGNode);
+    constructor(config?: YGConfig);
+    constructor(contextOrNodeOrConfig: any|YGNode|YGConfig = null,
+                print: YGPrintFunc = null,
+                hasNewLayout: boolean = true,
+                nodeType: YGNodeType = YGNodeType.Default,
+                measure: YGMeasureFunc = null,
+                baseline: YGBaselineFunc = null,
+                dirtied: YGDirtiedFunc = null,
+                style: YGStyle = new YGStyle(),
+                layout: YGLayout = new YGLayout(),
+                lineIndex: number = 0,
+                owner: YGNode = null,
+                children: YGVector = new YGVector(),
+                config: YGConfig = null,
+                isDirty: boolean = false,
+                resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined, YGValueUndefined]
                 ) {
-        this.context_ = context;
+        if (contextOrNodeOrConfig instanceof YGNode) {
+            this.fromNode(contextOrNodeOrConfig);
+            return;
+        }
+
         this.print_ = print;
         this.hasNewLayout_ = hasNewLayout;
         this.nodeType_ = nodeType;
@@ -103,10 +114,35 @@ class YGNode {
         this.lineIndex_ = lineIndex;
         this.owner_ = owner;
         this.children_ = children;
-        this.nextChild_ = nextChild;
         this.config_ = config;
         this.isDirty_ = isDirty;
         this.resolvedDimensions_ = resolvedDimensions;
+
+        if (contextOrNodeOrConfig instanceof YGConfig) {
+            this.config_ = contextOrNodeOrConfig;
+            this.context_ = null;
+        } else {
+            this.context_ = contextOrNodeOrConfig;
+        }
+    }
+
+    fromNode(node: YGNode): void {
+        this.context_ = node.context_;
+        this.print_ = node.print_;
+        this.hasNewLayout_ = node.hasNewLayout_;
+        this.nodeType_ = node.nodeType_;
+        this.measure_ = node.measure_;
+        this.baseline_ = node.baseline_;
+        this.dirtied_ = node.dirtied_;
+        this.style_ = node.style_;
+        this.layout_ = node.layout_;
+        this.lineIndex_ = node.lineIndex_;
+        this.owner_ = node.owner_;
+        this.children_ = node.children_;
+        this.nextChild_ = node.nextChild_;
+        this.config_ = node.config_;
+        this.isDirty_ = node.isDirty_;
+        this.resolvedDimensions_ = node.resolvedDimensions_;
     }
 
     getContext(): any {

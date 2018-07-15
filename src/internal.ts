@@ -1,7 +1,8 @@
 import {
     YGMeasureMode,
     YGEdge,
-    YGUnit
+    YGUnit,
+    YGLogLevel
 } from "./enums";
 
 import { YGNode } from "./ygnode";
