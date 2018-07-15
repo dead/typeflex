@@ -62,7 +62,6 @@ class YGNode {
     private lineIndex_: number;
     private owner_: YGNode;
     private children_: YGVector;
-    private nextChild_: YGNode;
     private config_: YGConfig;
     private isDirty_: boolean;
     private resolvedDimensions_: [YGValue, YGValue];
@@ -139,7 +138,6 @@ class YGNode {
         this.lineIndex_ = node.lineIndex_;
         this.owner_ = node.owner_;
         this.children_ = node.children_;
-        this.nextChild_ = node.nextChild_;
         this.config_ = node.config_;
         this.isDirty_ = node.isDirty_;
         this.resolvedDimensions_ = node.resolvedDimensions_;
@@ -203,10 +201,6 @@ class YGNode {
 
     getChild(index: number): YGNode {
         return this.children_.at(index);
-    }
-
-    getNextChild(): YGNode {
-        return this.nextChild_;
     }
 
     getConfig(): YGConfig {
@@ -402,10 +396,6 @@ class YGNode {
 
     setChildren(children: YGVector): void {
         this.children_ = children;
-    }
-
-    setNextChild(nextChild: YGNode): void {
-        this.nextChild_ = nextChild;
     }
 
     setConfig(config: YGConfig): void {

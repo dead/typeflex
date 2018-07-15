@@ -206,11 +206,7 @@ export function YGNodeDeepClone(oldNode: YGNode): YGNode {
     if (oldNode.getConfig() != null) {
         node.setConfig(YGConfigClone(oldNode.getConfig()));
     }
-
-    if (oldNode.getNextChild() != null) {
-        node.setNextChild(YGNodeDeepClone(oldNode.getNextChild()));
-    }
-
+    
     return node;
 }
 
@@ -264,7 +260,7 @@ export function YGNodeReset(node: YGNode):void {
     const config: YGConfig = node.getConfig();
 
     node.fromNode(new YGNode());
-    
+
     if (config.useWebDefaults) {
         node.setStyleFlexDirection(YGFlexDirection.Row);
         node.setStyleAlignContent(YGAlign.Stretch);
