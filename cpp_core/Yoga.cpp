@@ -1,178 +1,3 @@
-void YGNodeSetChildrenInternal(owner: YGNode, std::vector<YGNode> children)
-{
-  if (!owner) {
-    return;
-  }
-  if (children.size() == 0) {
-    if (YGNodeGetChildCount(owner) > 0) {
-      for (child: YGNode : owner.getChildren()) {
-        child.setLayout(YGLayout());
-        child.setOwner(null);
-      }
-      owner.setChildren(YGVector());
-      owner.markDirtyAndPropogate();
-    }
-  } else {
-    if (YGNodeGetChildCount(owner) > 0) {
-      for (oldChild: YGNode : owner.getChildren()) {
-
-        if (std::find(children.begin(), children.end(), oldChild) == children.end()) {
-          oldChild.setLayout(YGLayout());
-          oldChild.setOwner(null);
-        }
-      }
-    }
-    owner.setChildren(children);
-    for (child: YGNode : children) {
-      child.setOwner(owner);
-    }
-    owner.markDirtyAndPropogate();
-  }
-}
-
-void YGNodeSetChildren(owner: YGNode, c: YGNode[], count) {
-  YGVector children = {c, c + count};
-  YGNodeSetChildrenInternal(owner, children);
-}
-
-void YGNodeSetChildren(owner: YGNode, std::vector<YGNode> children)
-{
-  YGNodeSetChildrenInternal(owner, children);
-}
-
-YGNodeGetChild: YGNode(node: YGNode, index) {
-  if (index < node.getChildren().size()) {
-    return node.getChild(index);
-  }
-  return null;
-}
-
-YGNodeGetChildCount(node: YGNode) {
-  return static_cast<uint32_t>(node.getChildren().size());
-}
-
-YGNodeGetOwner: YGNode(node: YGNode) {
-  return node.getOwner();
-}
-
-YGNodeGetParent: YGNode(node: YGNode) {
-  return node.getOwner();
-}
-
-void YGNodeMarkDirty(node: YGNode) {
-  YGAssertWithNode(
-      node,
-      node.getMeasure() != null,
-      "Only leaf nodes with custom measure functions"
-      "should manually mark themselves as dirty");
-
-  node.markDirtyAndPropogate();
-}
-
-void YGNodeCopyStyle(dstNode: YGNode, srcNode: YGNode) {
-  if (!(dstNode.getStyle() == srcNode.getStyle())) {
-    dstNode.setStyle(srcNode.getStyle());
-    dstNode.markDirtyAndPropogate();
-  }
-}
-
-float YGNodeStyleGetFlexGrow(node: YGNode) {
-  return node.getStyle().flexGrow.isUndefined()
-      ? kDefaultFlexGrow
-      : node.getStyle().flexGrow.getValue();
-}
-
-float YGNodeStyleGetFlexShrink(node: YGNode) {
-  return node.getStyle().flexShrink.isUndefined()
-      ? (node.getConfig().useWebDefaults ? kWebDefaultFlexShrink
-                                           : kDefaultFlexShrink)
-      : node.getStyle().flexShrink.getValue();
-}
-
-#define YG_NODE_STYLE_PROPERTY_SETTER_IMPL(                               \
-    type, name, paramName, instanceName)                                  \
-  void YGNodeStyleSet##name(node: YGNode, type paramName) { \
-    if (node.getStyle().instanceName != paramName) {                     \
-      YGStyle style = node.getStyle();                                   \
-      style.instanceName = paramName;                                     \
-      node.setStyle(style);                                              \
-      node.markDirtyAndPropogate();                                      \
-    }                                                                     \
-  }
-
-#define YG_NODE_STYLE_PROPERTY_SETTER_UNIT_IMPL(                          \
-    type, name, paramName, instanceName)                                  \
-  void YGNodeStyleSet##name(node: YGNode, type paramName) { \
-    YGValue value = {                                                     \
-        YGFloatSanitize(paramName),                                       \
-        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Point,    \
-    };                                                                    \
-    if ((node.getStyle().instanceName.value != value.value             \
-         value.unit != YGUnit.Undefined) ||                                \
-        node.getStyle().instanceName.unit != value.unit) {               \
-      YGStyle style = node.getStyle();                                   \
-      style.instanceName = value;                                         \
-      node.setStyle(style);                                              \
-      node.markDirtyAndPropogate();                                      \
-    }                                                                     \
-  }                                                                       \
-                                                                          \
-  void YGNodeStyleSet##name##Percent(                                     \
-      node: YGNode, type paramName) {                       \
-    YGValue value = {                                                     \
-        YGFloatSanitize(paramName),                                       \
-        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Percent,  \
-    };                                                                    \
-    if ((node.getStyle().instanceName.value != value.value             \
-         value.unit != YGUnit.Undefined) ||                                \
-        node.getStyle().instanceName.unit != value.unit) {               \
-      YGStyle style = node.getStyle();                                   \
-                                                                          \
-      style.instanceName = value;                                         \
-      node.setStyle(style);                                              \
-      node.markDirtyAndPropogate();                                      \
-    }                                                                     \
-  }
-
-#define YG_NODE_STYLE_PROPERTY_SETTER_UNIT_AUTO_IMPL(                        \
-    type, name, paramName, instanceName)                                     \
-  void YGNodeStyleSet##name(node: YGNode, type paramName) {    \
-    YGValue value = {                                                        \
-        YGFloatSanitize(paramName),                                          \
-        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Point,       \
-    };                                                                       \
-    if ((node.getStyle().instanceName.value != value.value                \
-         value.unit != YGUnit.Undefined) ||                                   \
-        node.getStyle().instanceName.unit != value.unit) {                  \
-      YGStyle style = node.getStyle();                                      \
-      style.instanceName = value;                                            \
-      node.setStyle(style);                                                 \
-      node.markDirtyAndPropogate();                                         \
-    }                                                                        \
-  }                                                                          \
-                                                                             \
-  void YGNodeStyleSet##name##Percent(                                        \
-      node: YGNode, type paramName) {                          \
-    if (node.getStyle().instanceName.value != YGFloatSanitize(paramName) || \
-        node.getStyle().instanceName.unit != YGUnit.Percent) {               \
-      YGStyle style = node.getStyle();                                      \
-      style.instanceName.value = YGFloatSanitize(paramName);                 \
-      style.instanceName.unit =                                              \
-          YGFloatIsUndefined(paramName) ? YGUnit.Auto : YGUnit.Percent;        \
-      node.setStyle(style);                                                 \
-      node.markDirtyAndPropogate();                                         \
-    }                                                                        \
-  }                                                                          \
-                                                                             \
-  void YGNodeStyleSet##name##Auto(node: YGNode) {                    \
-    if (node.getStyle().instanceName.unit != YGUnit.Auto) {                  \
-      YGStyle style = node.getStyle();                                      \
-      style.instanceName.value = 0;                                          \
-      style.instanceName.unit = YGUnit.Auto;                                  \
-      node.setStyle(style);                                                 \
-      node.markDirtyAndPropogate();                                         \
-    }                                                                        \
-  }
 
 #define YG_NODE_STYLE_PROPERTY_IMPL(type, name, paramName, instanceName)  \
   YG_NODE_STYLE_PROPERTY_SETTER_IMPL(type, name, paramName, instanceName) \
@@ -289,7 +114,8 @@ float YGNodeStyleGetFlexShrink(node: YGNode) {
     }                                                                   \
                                                                         \
     return node.getLayout().instanceName[edge];                        \
-  }YG_NODE_STYLE_PROPERTY_IMPL(YGDirection, Direction, direction, direction);
+  }
+YG_NODE_STYLE_PROPERTY_IMPL(YGDirection, Direction, direction, direction);
 YG_NODE_STYLE_PROPERTY_IMPL(YGFlexDirection, FlexDirection, flexDirection, flexDirection);
 YG_NODE_STYLE_PROPERTY_IMPL(YGJustify, JustifyContent, justifyContent, justifyContent);
 YG_NODE_STYLE_PROPERTY_IMPL(YGAlign, AlignContent, alignContent, alignContent);
@@ -298,7 +124,8 @@ YG_NODE_STYLE_PROPERTY_IMPL(YGAlign, AlignSelf, alignSelf, alignSelf);
 YG_NODE_STYLE_PROPERTY_IMPL(YGPositionType, PositionType, positionType, positionType);
 YG_NODE_STYLE_PROPERTY_IMPL(YGWrap, FlexWrap, flexWrap, flexWrap);
 YG_NODE_STYLE_PROPERTY_IMPL(YGOverflow, Overflow, overflow, overflow);
-YG_NODE_STYLE_PROPERTY_IMPL(YGDisplay, Display, display, display);void YGNodeStyleSetFlex(node: YGNode, float flex) {
+YG_NODE_STYLE_PROPERTY_IMPL(YGDisplay, Display, display, display);
+void YGNodeStyleSetFlex(node: YGNode, float flex) {
   if (node.getStyle().flex != flex) {
     YGStyle style = node.getStyle();
     if (YGFloatIsUndefined(flex)) {
@@ -309,10 +136,12 @@ YG_NODE_STYLE_PROPERTY_IMPL(YGDisplay, Display, display, display);void YGNodeSty
     node.setStyle(style);
     node.markDirtyAndPropogate();
   }
-}float YGNodeStyleGetFlex(node: YGNode) {
+}
+float YGNodeStyleGetFlex(node: YGNode) {
   return node.getStyle().flex.isUndefined() ? YGUndefined
                                              : node.getStyle().flex.getValue();
-}void YGNodeStyleSetFlexGrow(node: YGNode, float flexGrow) {
+}
+void YGNodeStyleSetFlexGrow(node: YGNode, float flexGrow) {
   if (node.getStyle().flexGrow != flexGrow) {
     YGStyle style = node.getStyle();
     if (YGFloatIsUndefined(flexGrow)) {
@@ -323,7 +152,8 @@ YG_NODE_STYLE_PROPERTY_IMPL(YGDisplay, Display, display, display);void YGNodeSty
     node.setStyle(style);
     node.markDirtyAndPropogate();
   }
-}void YGNodeStyleSetFlexShrink(node: YGNode, float flexShrink) {
+}
+void YGNodeStyleSetFlexShrink(node: YGNode, float flexShrink) {
   if (node.getStyle().flexShrink != flexShrink) {
     YGStyle style = node.getStyle();
     if (YGFloatIsUndefined(flexShrink)) {
@@ -387,7 +217,8 @@ void YGNodeStyleSetFlexBasisAuto(node: YGNode) {
 YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(YGValue, Position, position, position);
 YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(YGValue, Margin, margin, margin);
 YG_NODE_STYLE_EDGE_PROPERTY_UNIT_AUTO_IMPL(YGValue, Margin, margin);
-YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(YGValue, Padding, padding, padding);void YGNodeStyleSetBorder(
+YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(YGValue, Padding, padding, padding);
+void YGNodeStyleSetBorder(
     node: YGNode,
     YGEdge edge,
     float border) {
@@ -411,10 +242,12 @@ float YGNodeStyleGetBorder(node: YGNode, YGEdge edge) {
   }
 
   return node.getStyle().border[edge].value;
-}float YGNodeStyleGetAspectRatio(node: YGNode) {
+}
+float YGNodeStyleGetAspectRatio(node: YGNode) {
   YGFloatOptional op = node.getStyle().aspectRatio;
   return op.isUndefined() ? YGUndefined : op.getValue();
-}void YGNodeStyleSetAspectRatio(node: YGNode, float aspectRatio) {
+}
+void YGNodeStyleSetAspectRatio(node: YGNode, float aspectRatio) {
   if (node.getStyle().aspectRatio != aspectRatio) {
     YGStyle style = node.getStyle();
     style.aspectRatio = YGFloatOptional(aspectRatio);
@@ -608,7 +441,8 @@ YGFloatOptional YGNodeBoundAxisWithinMinAndMax(
   }
 
   return YGFloatOptional(value);
-}inline float YGNodeBoundAxis(node: YGNode,
+}
+inline float YGNodeBoundAxis(node: YGNode,
                                     YGFlexDirection axis,
                                     float value,
                                     float axisSize,
@@ -1052,7 +886,8 @@ void YGNodeWithMeasureFuncSetMeasuredDimensions(node: YGNode,
             ownerWidth),
         YGDimensionHeight);
   }
-}void YGNodeEmptyContainerSetMeasuredDimensions(node: YGNode,
+}
+void YGNodeEmptyContainerSetMeasuredDimensions(node: YGNode,
                                                       float availableWidth,
                                                       float availableHeight,
                                                       YGMeasureMode widthMeasureMode,
@@ -1260,7 +1095,8 @@ void YGNodeComputeFlexBasisForChildren(
         child.getLayout().computedFlexBasis +
         child.getMarginForAxis(mainAxis, availableInnerWidth));
   }
-}YGCollectFlexItemsRowValues YGCalculateCollectFlexItemsRowValues(
+}
+YGCollectFlexItemsRowValues YGCalculateCollectFlexItemsRowValues(
     YGNode node,
     YGDirection ownerDirection,
     float mainAxisownerSize,
@@ -1318,7 +1154,8 @@ void YGNodeComputeFlexBasisForChildren(
   }
   flexAlgoRowMeasurement.endOfLineIndex = endOfLineIndex;
   return flexAlgoRowMeasurement;
-}float YGDistributeFreeSpaceSecondPass(
+}
+float YGDistributeFreeSpaceSecondPass(
     YGCollectFlexItemsRowValues collectedFlexItemsValues,
     node: YGNode,
     YGFlexDirection mainAxis,
@@ -1491,7 +1328,8 @@ void YGNodeComputeFlexBasisForChildren(
         currentRelativeChild.getLayout().hadOverflow);
   }
   return deltaFreeSpace;
-}void YGDistributeFreeSpaceFirstPass(
+}
+void YGDistributeFreeSpaceFirstPass(
     YGCollectFlexItemsRowValues collectedFlexItemsValues,
     YGFlexDirection mainAxis,
     float mainAxisownerSize,
@@ -1555,7 +1393,8 @@ void YGNodeComputeFlexBasisForChildren(
     }
   }
   collectedFlexItemsValues.remainingFreeSpace -= deltaFreeSpace;
-}void YGResolveFlexibleLength(
+}
+void YGResolveFlexibleLength(
     node: YGNode,
     YGCollectFlexItemsRowValues collectedFlexItemsValues,
     YGFlexDirection mainAxis,
@@ -1742,7 +1581,8 @@ void YGJustifyMainAxis(
   }
   collectedFlexItemsValues.mainDim += YGUnwrapFloatOptional(
       node.getTrailingPaddingAndBorder(mainAxis, ownerWidth));
-}void YGNodelayoutImpl(node: YGNode,
+}
+void YGNodelayoutImpl(node: YGNode,
                              float availableWidth,
                              float availableHeight,
                              YGDirection ownerDirection,
@@ -2568,7 +2408,8 @@ bool YGNodeCanUseCachedMeasurement(YGMeasureMode widthMode,
           heightMode, height - marginColumn, lastHeightMode, lastHeight, lastComputedHeight);
 
   return widthIsCompatible  heightIsCompatible;
-}bool YGLayoutNodeInternal(node: YGNode,
+}
+bool YGLayoutNodeInternal(node: YGNode,
                           float availableWidth,
                           float availableHeight,
                           YGDirection ownerDirection,

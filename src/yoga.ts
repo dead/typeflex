@@ -10,10 +10,14 @@ import {
 
 import { YGNode } from "./ygnode";
 import { YGConfig } from "./ygconfig";
+import { YGLayout } from "./yglayout";
 
 import {
     YGValueUndefined,
-    YGVector
+    kDefaultFlexGrow,
+    kWebDefaultFlexShrink,
+    kDefaultFlexShrink
+
 } from "./internal";
 
 export class YGSize {
@@ -108,7 +112,7 @@ export function YGNodeSetBaselineFunc(node: YGNode, baselineFunc: YGBaselineFunc
     node.setBaseLineFunc(baselineFunc);
 }
 
-export function YGNodeGetDirtiedFunc(node: YGNode) : YGDirtiedFunc {
+export function YGNodeGetDirtiedFunc(node: YGNode): YGDirtiedFunc {
     return node.getDirtied();
 }
 
@@ -191,22 +195,22 @@ export function YGConfigClone(oldConfig: YGConfig) {
 
 export function YGNodeDeepClone(oldNode: YGNode): YGNode {
     const node: YGNode = YGNodeClone(oldNode);
-    const vec: YGVector = new YGVector();
-    vec.reserve(oldNode.getChildren().size());
+    const vec: Array<YGNode> = new Array(oldNode.getChildren().length);
 
     let childNode: YGNode = null;
-    for (let i: number = 0; i < oldNode.getChildren().size(); ++i) {
+    for (let i: number = 0; i < oldNode.getChildren().length; ++i) {
         const item: YGNode = oldNode.getChild(i);
         childNode = YGNodeDeepClone(item);
         childNode.setOwner(node);
-        vec.push_back(childNode);
+        vec.push(childNode);
     }
+
     node.setChildren(vec);
 
     if (oldNode.getConfig() != null) {
         node.setConfig(YGConfigClone(oldNode.getConfig()));
     }
-    
+
     return node;
 }
 
@@ -218,7 +222,7 @@ export function YGNodeFree(node: YGNode): void {
         node.setOwner(null);
     }
 
-    const childCount:number = YGNodeGetChildCount(node);
+    const childCount: number = YGNodeGetChildCount(node);
     for (let i: number = 0; i < childCount; i++) {
         const child: YGNode = YGNodeGetChild(node, i);
         child.setOwner(null);
@@ -252,7 +256,7 @@ export function YGNodeFreeRecursive(root: YGNode): void {
     YGNodeFree(root);
 }
 
-export function YGNodeReset(node: YGNode):void {
+export function YGNodeReset(node: YGNode): void {
     //YGAssertWithNode(node, YGNodeGetChildCount(node) == 0, "Cannot reset a node which still has children attached");
     //YGAssertWithNode(node, node->getOwner() == nullptr, "Cannot reset a node still attached to a owner");
 
@@ -308,11 +312,11 @@ export function YGNodeInsertSharedChild(node: YGNode, child: YGNode, index: numb
     node.markDirtyAndPropogate();
 }
 
-export function YGNodeRemoveChild(owner: YGNode, excludedChild: YGNode) : void {
+export function YGNodeRemoveChild(owner: YGNode, excludedChild: YGNode): void {
     const childCount: number = YGNodeGetChildCount(owner);
-  
+
     if (childCount == 0) {
-      return;
+        return;
     }
 
     const firstChild: YGNode = YGNodeGetChild(owner, 0);
@@ -359,23 +363,191 @@ export function YGNodeRemoveChild(owner: YGNode, excludedChild: YGNode) : void {
 export function YGNodeRemoveAllChildren(owner: YGNode): void {
     const childCount = YGNodeGetChildCount(owner);
     if (childCount == 0) {
-      return;
+        return;
     }
 
     const firstChild: YGNode = YGNodeGetChild(owner, 0);
     if (firstChild.getOwner() == owner) {
-      for (let i = 0; i < childCount; i++) {
-        const oldChild: YGNode = YGNodeGetChild(owner, i);
-        oldChild.setLayout(new YGNode().getLayout());
-        oldChild.setOwner(null);
-      }
-      owner.clearChildren();
-      owner.markDirtyAndPropogate();
-      return;
+        for (let i = 0; i < childCount; i++) {
+            const oldChild: YGNode = YGNodeGetChild(owner, i);
+            oldChild.setLayout(new YGLayout()); // new YGNode().getLayout()
+            oldChild.setOwner(null);
+        }
+
+        owner.clearChildren();
+        owner.markDirtyAndPropogate();
+        return;
     }
 
-    owner.setChildren(new YGVector());
+    owner.setChildren(new Array());
     owner.markDirtyAndPropogate();
 }
 
+export function YGNodeSetChildrenInternal(owner: YGNode, children: Array<YGNode>): void {
+    if (!owner) {
+        return;
+    }
+
+    const ownerChildren: Array<YGNode> = owner.getChildren();
+    if (children.length == 0) {
+        if (ownerChildren.length > 0) {
+            for (let i = 0; i < ownerChildren.length; i++) {
+                const child: YGNode = ownerChildren[i];
+                child.setLayout(new YGLayout());
+                child.setOwner(null);
+            }
+
+            owner.setChildren(new Array());
+            owner.markDirtyAndPropogate();
+        }
+    } else {
+        if (ownerChildren.length > 0) {
+            for (let i = 0; i < ownerChildren.length; i++) {
+                const oldChild: YGNode = ownerChildren[i];
+                if (children.indexOf(oldChild) < 0) {
+                    oldChild.setLayout(new YGLayout());
+                    oldChild.setOwner(null);
+                }
+            }
+        }
+
+        owner.setChildren(children);
+        for (let i = 0; i < children.length; i++) {
+            children[i].setOwner(owner);
+        }
+
+        owner.markDirtyAndPropogate();
+    }
+}
+
+/*function YGNodeSetChildren(owner: YGNode, c: Array<YGNode>, count: number) {
+    YGVector children = { c, c + count };
+    YGNodeSetChildrenInternal(owner, children);
+}*/
+
+export function YGNodeSetChildren(owner: YGNode, children: Array<YGNode>): void {
+    YGNodeSetChildrenInternal(owner, children);
+}
+
+
+export function YGNodeGetChild(node: YGNode, index: number): YGNode {
+    const children = node.getChildren();
+    if (index < children.length) {
+        return children[index];
+    }
+    return null;
+}
+
+export function YGNodeGetChildCount(node: YGNode): number {
+    return node.getChildrenCount();
+}
+
+export function YGNodeGetOwner(node: YGNode): YGNode {
+    return node.getOwner();
+}
+
+export function YGNodeGetParent(node: YGNode): YGNode {
+    return node.getOwner();
+}
+
+export function YGNodeMarkDirty(node: YGNode): void {
+    //YGAssertWithNode(node, node.getMeasure() != null, "Only leaf nodes with custom measure functions should manually mark themselves as dirty");
+    node.markDirtyAndPropogate();
+}
+
+export function YGNodeCopyStyle(dstNode: YGNode, srcNode: YGNode): void {
+    if (!(dstNode.getStyle().isEqual(srcNode.getStyle()))) {
+        dstNode.setStyle(srcNode.getStyle());
+        dstNode.markDirtyAndPropogate();
+    }
+}
+
+export function YGNodeStyleGetFlexGrow(node: YGNode): number {
+    return node.getStyle().flexGrow.isUndefined() ? kDefaultFlexGrow : node.getStyle().flexGrow.getValue();
+}
+
+export function YGNodeStyleGetFlexShrink(node: YGNode): number {
+    return node.getStyle().flexShrink.isUndefined() ? (node.getConfig().useWebDefaults ? kWebDefaultFlexShrink : kDefaultFlexShrink) : node.getStyle().flexShrink.getValue();
+}
+
+/*
+// YG_NODE_STYLE_PROPERTY_SETTER_IMPL
+export function YGNodeStyleSet##name(node: YGNode, paramName: type): void {
+    if(node.getStyle().instanceName != paramName) {
+        const style: YGStyle = node.getStyle();
+        style.instanceName = paramName;
+        node.setStyle(style);
+        node.markDirtyAndPropogate();
+    }
+}
+
+// YG_NODE_STYLE_PROPERTY_SETTER_UNIT_IMPL
+export function YGNodeStyleSet##name(node: YGNode, paramName: type): void {
+    const value: YGValue = new YGValue(
+        YGFloatSanitize(paramName),
+        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Point
+    );
+
+    if ((node.getStyle().instanceName.value != value.value && value.unit != YGUnit.Undefined) ||
+        node.getStyle().instanceName.unit != value.unit) {
+        YGStyle style = node.getStyle();
+        style.instanceName = value;
+        node.setStyle(style);
+        node.markDirtyAndPropogate();
+    }
+}
+
+void YGNodeStyleSet##name##Percent(node: YGNode, paramName: type) {
+    const value: YGValue = new YGValue(
+        YGFloatSanitize(paramName),
+        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Percent,
+    );
+
+    if ((node.getStyle().instanceName.value != value.value && value.unit != YGUnit.Undefined) ||
+        node.getStyle().instanceName.unit != value.unit) {
+        const style: YGStyle = node.getStyle();
+        style.instanceName = value;                  
+        node.setStyle(style);                       
+        node.markDirtyAndPropogate();               
+    }
+}
+
+// YG_NODE_STYLE_PROPERTY_SETTER_UNIT_AUTO_IMPL
+export function YGNodeStyleSet##name##(node: YGNode, paramName: type): void {
+    const value: YGValue = new YGValue(
+        YGFloatSanitize(paramName),
+        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Point,
+    );
+
+    if ((node.getStyle().instanceName.value != value.value && value.unit != YGUnit.Undefined) ||
+        node.getStyle().instanceName.unit != value.unit) {
+        const style: YGStyle = node.getStyle();
+        style.instanceName = value;
+        node.setStyle(style);
+        node.markDirtyAndPropogate();
+    }
+}
+
+export function YGNodeStyleSet##name##Percent(node: YGNode, paramName: type): void {
+    if ((node.getStyle().instanceName.value != YGFloatSanitize(paramName) ||
+        node.getStyle().instanceName.unit != YGUnit.Percent) {
+        const style: YGStyle = node.getStyle();
+        style.instanceName.value = YGFloatSanitize(paramName);
+        style.instanceName.unit = YGFloatIsUndefined(paramName) ? YGUnit.Auto : YGUnit.Percent;
+        node.setStyle(style);
+        node.markDirtyAndPropogate();
+    }
+}
+
+export function YGNodeStyleSet##name##Auto(node: YGNode): void {
+    if (node.getStyle().instanceName.unit != YGUnit.Auto) {
+        const style: YGStyle = node.getStyle();
+        style.instanceName.value = 0;
+        style.instanceName.unit = YGUnit.Auto;
+        node.setStyle(style);
+        node.markDirtyAndPropogate();
+    }
+}
+
+*/
 

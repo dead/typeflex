@@ -25,8 +25,7 @@ import {
 
 import { YGLayout } from "./yglayout";
 import { YGStyle } from "./ygstyle";
-import { 
-    YGVector,
+import {
     trailing,
     leading,
     YGValueUndefined,
@@ -61,7 +60,7 @@ class YGNode {
     private layout_: YGLayout;
     private lineIndex_: number;
     private owner_: YGNode;
-    private children_: YGVector;
+    private children_: Array<YGNode>;
     private config_: YGConfig;
     private isDirty_: boolean;
     private resolvedDimensions_: [YGValue, YGValue];
@@ -92,7 +91,7 @@ class YGNode {
                 layout: YGLayout = new YGLayout(),
                 lineIndex: number = 0,
                 owner: YGNode = null,
-                children: YGVector = new YGVector(),
+                children: Array<YGNode> = [],
                 config: YGConfig = null,
                 isDirty: boolean = false,
                 resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined, YGValueUndefined]
@@ -123,6 +122,16 @@ class YGNode {
         } else {
             this.context_ = contextOrNodeOrConfig;
         }
+    }
+
+    operatorAtrib(node: YGNode): YGNode {
+        if (node == this) {
+            return this;
+        }
+
+        this.clearChildren();
+        this.fromNode(node);
+        return this;
     }
 
     fromNode(node: YGNode): void {
@@ -191,16 +200,16 @@ class YGNode {
         return this.getOwner();
     }
 
-    getChildren(): YGVector {
+    getChildren(): Array<YGNode> {
         return this.children_;
     }
 
     getChildrenCount(): number {
-        return this.children_.size();
+        return this.children_.length;
     }
 
     getChild(index: number): YGNode {
-        return this.children_.at(index);
+        return this.children_[index];
     }
 
     getConfig(): YGConfig {
@@ -352,7 +361,7 @@ class YGNode {
         }
         else {
             //YGAssertWithNode(this, this.children_.size() == 0, "Cannot set measure function: Nodes with measure functions cannot have children.");
-            if (this.children_.size() == 0) {
+            if (this.children_.length == 0) {
                 console.error("Cannot set measure function: Nodes with measure functions cannot have children.");
             }
             this.measure_ = measureFunc;
@@ -394,7 +403,7 @@ class YGNode {
         this.owner_ = owner;
     }
 
-    setChildren(children: YGVector): void {
+    setChildren(children: Array<YGNode>): void {
         this.children_ = children;
     }
 
@@ -465,9 +474,10 @@ class YGNode {
 
     setAndPropogateUseLegacyFlag(useLegacyFlag: boolean): void {
         this.config_.useLegacyStretchBehaviour = useLegacyFlag;
-        this.children_.foreach((childNode) => {
-            childNode.getConfig().useLegacyStretchBehaviour = useLegacyFlag;
-        });
+
+        for(let i = 0; i < this.children_.length; i++) {
+            this.children_[i].getConfig().useLegacyStretchBehaviour = useLegacyFlag;
+        }
     }
 
     setLayoutDoesLegacyFlagAffectsLayout(doesLegacyFlagAffectsLayout: boolean): void {
@@ -480,9 +490,9 @@ class YGNode {
 
     markDirtyAndPropogateDownwards(): void {
         this.isDirty_ = true;
-        this.children_.foreach((childNode) => {
-            childNode.markDirtyAndPropogateDownwards();
-        });
+        for (let i = 0; i < this.children_.length; i++) {
+            this.children_[i].markDirtyAndPropogateDownwards();
+        }
     }
 
     marginLeadingValue(axis: YGFlexDirection): YGValue {
@@ -534,44 +544,55 @@ class YGNode {
     }
 
     clearChildren(): void {
-        this.children_.clear();
-        this.children_.shrink_to_fit();
+        while (this.children_.length > 0) {
+            this.children_.pop();
+        }
     }
 
     replaceChild(oldChild: YGNode, newChild: YGNode): void {
-        this.children_.replace(oldChild, newChild);
+        const index = this.children_.indexOf(oldChild);
+        if (index >= 0) {
+            this.children_[index] = newChild;
+        }
     }
 
     replaceChildIndex(child: YGNode, index: number): void {
-        this.children_.replaceIndex(child, index);
+        this.children_[index] = child;
     }
 
     insertChildIndex(child: YGNode, index: number): void {
-        this.children_.insert(child, index);
+        this.children_.splice(index, 0, child);
     }
 
     removeChild(child: YGNode): boolean {
-        return this.children_.remove(child);
+        const index = this.children_.indexOf(child);
+
+        if (index >= 0) {
+            this.children_.splice(index, 1);
+            return true;
+        }
+
+        return false;
     }
 
     removeChildIndex(index: number): void {
-        this.children_.removeIndex(index);
+        this.children_.splice(index, 1);
     }
 
     cloneChildrenIfNeeded(): void {
-        const childCount: number = this.children_.size();
+        const childCount: number = this.children_.length;
         if (childCount == 0) {
             return;
         }
 
-        const firstChild: YGNode = this.children_.front();
+        const firstChild: YGNode = this.children_[0];
         if (firstChild.getOwner() == this) {
             return;
         }
 
         const cloneNodeCallback: YGCloneNodeFunc = this.config_.cloneNodeCallback;
         for (let i: number = 0; i < childCount; ++i) {
-            const oldChild: YGNode = this.children_.at(i);
+            const oldChild: YGNode = this.children_[i];
             let newChild: YGNode = null;
 
             if (cloneNodeCallback) {
@@ -640,8 +661,8 @@ class YGNode {
             return true;
         }
 
-        for (let i: number = 0; i < this.children_.size(); i++) {
-            if (this.children_.at(i).getLayout().didUseLegacyFlag) {
+        for (let i: number = 0; i < this.children_.length; i++) {
+            if (this.children_[i].getLayout().didUseLegacyFlag) {
                 didUseLegacyFlag = true;
                 break;
             }
@@ -651,7 +672,7 @@ class YGNode {
     }
 
     isLayoutTreeEqualToNode(node: YGNode): boolean {
-        if (this.children_.size() != node.getChildren().size()) {
+        if (this.children_.length != node.getChildren().length) {
             return false;
         }
 
@@ -659,14 +680,14 @@ class YGNode {
             return false;
         }
 
-        if (this.children_.size() == 0) {
+        if (this.children_.length == 0) {
             return true;
         }
 
         let isLayoutTreeEqual: boolean = true;
-        for (let i: number = 0; i < this.children_.size(); ++i) {
+        for (let i: number = 0; i < this.children_.length; ++i) {
             const otherNodeChildren: YGNode = node.getChild(i);
-            isLayoutTreeEqual = this.children_.at(i).isLayoutTreeEqualToNode(otherNodeChildren);
+            isLayoutTreeEqual = this.children_[i].isLayoutTreeEqualToNode(otherNodeChildren);
             if (!isLayoutTreeEqual) {
                 return false;
             }

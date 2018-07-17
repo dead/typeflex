@@ -37,7 +37,7 @@ class YGLayout {
         this.computedFlexBasis = new YGFloatOptional();
         this.hadOverflow = false;
         this.generationCount = 0;
-        //this.lastOwnerDirection = lastOwnerDirection((YGDirection)-1);
+        this.lastOwnerDirection = YGDirection.RTL;
         this.nextCachedMeasurementsIndex = 0;
         this.measuredDimensions = kYGDefaultDimensionValues;
         this.cachedLayout = new YGCachedMeasurement();
