@@ -1,130 +1,3 @@
-
-#define YG_NODE_STYLE_PROPERTY_IMPL(type, name, paramName, instanceName)  \
-  YG_NODE_STYLE_PROPERTY_SETTER_IMPL(type, name, paramName, instanceName) \
-                                                                          \
-  type YGNodeStyleGet##name(node: YGNode) {                       \
-    return node.getStyle().instanceName;                                 \
-  }
-
-#define YG_NODE_STYLE_PROPERTY_UNIT_IMPL(type, name, paramName, instanceName) \
-  YG_NODE_STYLE_PROPERTY_SETTER_UNIT_IMPL(                                    \
-      float, name, paramName, instanceName)                                   \
-                                                                              \
-  type YGNodeStyleGet##name(node: YGNode) {                           \
-    YGValue value = node.getStyle().instanceName;                            \
-    if (value.unit == YGUnit.Undefined || value.unit == YGUnit.Auto) {          \
-      value.value = YGUndefined;                                              \
-    }                                                                         \
-    return value;                                                             \
-  }
-
-#define YG_NODE_STYLE_PROPERTY_UNIT_AUTO_IMPL(                       \
-    type, name, paramName, instanceName)                             \
-  YG_NODE_STYLE_PROPERTY_SETTER_UNIT_AUTO_IMPL(                      \
-      float, name, paramName, instanceName)                          \
-                                                                     \
-  type YGNodeStyleGet##name(node: YGNode) {                  \
-    YGValue value = node.getStyle().instanceName;                   \
-    if (value.unit == YGUnit.Undefined || value.unit == YGUnit.Auto) { \
-      value.value = YGUndefined;                                     \
-    }                                                                \
-    return value;                                                    \
-  }
-
-#define YG_NODE_STYLE_EDGE_PROPERTY_UNIT_AUTO_IMPL(type, name, instanceName) \
-  void YGNodeStyleSet##name##Auto(node: YGNode, YGEdge edge) { \
-    if (node.getStyle().instanceName[edge].unit != YGUnit.Auto) {            \
-      YGStyle style = node.getStyle();                                      \
-      style.instanceName[edge].value = 0;                                    \
-      style.instanceName[edge].unit = YGUnit.Auto;                            \
-      node.setStyle(style);                                                 \
-      node.markDirtyAndPropogate();                                         \
-    }                                                                        \
-  }
-
-#define YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(                           \
-    type, name, paramName, instanceName)                                 \
-  void YGNodeStyleSet##name(                                             \
-      node: YGNode, YGEdge edge, float paramName) {  \
-    YGValue value = {                                                    \
-        YGFloatSanitize(paramName),                                      \
-        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Point,   \
-    };                                                                   \
-    if ((node.getStyle().instanceName[edge].value != value.value      \
-         value.unit != YGUnit.Undefined) ||                               \
-        node.getStyle().instanceName[edge].unit != value.unit) {        \
-      YGStyle style = node.getStyle();                                  \
-      style.instanceName[edge] = value;                                  \
-      node.setStyle(style);                                             \
-      node.markDirtyAndPropogate();                                     \
-    }                                                                    \
-  }                                                                      \
-                                                                         \
-  void YGNodeStyleSet##name##Percent(                                    \
-      node: YGNode, YGEdge edge, float paramName) {  \
-    YGValue value = {                                                    \
-        YGFloatSanitize(paramName),                                      \
-        YGFloatIsUndefined(paramName) ? YGUnit.Undefined : YGUnit.Percent, \
-    };                                                                   \
-    if ((node.getStyle().instanceName[edge].value != value.value      \
-         value.unit != YGUnit.Undefined) ||                               \
-        node.getStyle().instanceName[edge].unit != value.unit) {        \
-      YGStyle style = node.getStyle();                                  \
-      style.instanceName[edge] = value;                                  \
-      node.setStyle(style);                                             \
-      node.markDirtyAndPropogate();                                     \
-    }                                                                    \
-  }                                                                      \
-                                                                         \
-  WIN_STRUCT(type)                                                       \
-  YGNodeStyleGet##name(node: YGNode, YGEdge edge) {        \
-    YGValue value = node.getStyle().instanceName[edge];                 \
-    if (value.unit == YGUnit.Undefined || value.unit == YGUnit.Auto) {     \
-      value.value = YGUndefined;                                         \
-    }                                                                    \
-    return WIN_STRUCT_REF(value);                                        \
-  }
-
-#define YG_NODE_LAYOUT_PROPERTY_IMPL(type, name, instanceName) \
-  type YGNodeLayoutGet##name(node: YGNode) {           \
-    return node.getLayout().instanceName;                     \
-  }
-
-#define YG_NODE_LAYOUT_RESOLVED_PROPERTY_IMPL(type, name, instanceName) \
-  type YGNodeLayoutGet##name(node: YGNode, YGEdge edge) { \
-    YGAssertWithNode(                                                   \
-        node,                                                           \
-        edge <= YGEdgeEnd,                                              \
-        "Cannot get layout properties of multi-edge shorthands");       \
-                                                                        \
-    if (edge == YGEdgeLeft) {                                           \
-      if (node.getLayout().direction == YGDirectionRTL) {              \
-        return node.getLayout().instanceName[YGEdgeEnd];               \
-      } else {                                                          \
-        return node.getLayout().instanceName[YGEdgeStart];             \
-      }                                                                 \
-    }                                                                   \
-                                                                        \
-    if (edge == YGEdgeRight) {                                          \
-      if (node.getLayout().direction == YGDirectionRTL) {              \
-        return node.getLayout().instanceName[YGEdgeStart];             \
-      } else {                                                          \
-        return node.getLayout().instanceName[YGEdgeEnd];               \
-      }                                                                 \
-    }                                                                   \
-                                                                        \
-    return node.getLayout().instanceName[edge];                        \
-  }
-YG_NODE_STYLE_PROPERTY_IMPL(YGDirection, Direction, direction, direction);
-YG_NODE_STYLE_PROPERTY_IMPL(YGFlexDirection, FlexDirection, flexDirection, flexDirection);
-YG_NODE_STYLE_PROPERTY_IMPL(YGJustify, JustifyContent, justifyContent, justifyContent);
-YG_NODE_STYLE_PROPERTY_IMPL(YGAlign, AlignContent, alignContent, alignContent);
-YG_NODE_STYLE_PROPERTY_IMPL(YGAlign, AlignItems, alignItems, alignItems);
-YG_NODE_STYLE_PROPERTY_IMPL(YGAlign, AlignSelf, alignSelf, alignSelf);
-YG_NODE_STYLE_PROPERTY_IMPL(YGPositionType, PositionType, positionType, positionType);
-YG_NODE_STYLE_PROPERTY_IMPL(YGWrap, FlexWrap, flexWrap, flexWrap);
-YG_NODE_STYLE_PROPERTY_IMPL(YGOverflow, Overflow, overflow, overflow);
-YG_NODE_STYLE_PROPERTY_IMPL(YGDisplay, Display, display, display);
 void YGNodeStyleSetFlex(node: YGNode, float flex) {
   if (node.getStyle().flex != flex) {
     YGStyle style = node.getStyle();
@@ -214,10 +87,7 @@ void YGNodeStyleSetFlexBasisAuto(node: YGNode) {
   }
 }
 
-YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(YGValue, Position, position, position);
-YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(YGValue, Margin, margin, margin);
-YG_NODE_STYLE_EDGE_PROPERTY_UNIT_AUTO_IMPL(YGValue, Margin, margin);
-YG_NODE_STYLE_EDGE_PROPERTY_UNIT_IMPL(YGValue, Padding, padding, padding);
+
 void YGNodeStyleSetBorder(
     node: YGNode,
     YGEdge edge,
@@ -255,25 +125,6 @@ void YGNodeStyleSetAspectRatio(node: YGNode, float aspectRatio) {
     node.markDirtyAndPropogate();
   }
 }
-
-YG_NODE_STYLE_PROPERTY_UNIT_AUTO_IMPL(YGValue, Width, width, dimensions[YGDimensionWidth]);
-YG_NODE_STYLE_PROPERTY_UNIT_AUTO_IMPL(YGValue, Height, height, dimensions[YGDimensionHeight]);
-YG_NODE_STYLE_PROPERTY_UNIT_IMPL(YGValue, MinWidth, minWidth, minDimensions[YGDimensionWidth]);
-YG_NODE_STYLE_PROPERTY_UNIT_IMPL(YGValue, MinHeight, minHeight, minDimensions[YGDimensionHeight]);
-YG_NODE_STYLE_PROPERTY_UNIT_IMPL(YGValue, MaxWidth, maxWidth, maxDimensions[YGDimensionWidth]);
-YG_NODE_STYLE_PROPERTY_UNIT_IMPL(YGValue, MaxHeight, maxHeight, maxDimensions[YGDimensionHeight]);
-YG_NODE_LAYOUT_PROPERTY_IMPL(float, Left, position[YGEdgeLeft]);
-YG_NODE_LAYOUT_PROPERTY_IMPL(float, Top, position[YGEdgeTop]);
-YG_NODE_LAYOUT_PROPERTY_IMPL(float, Right, position[YGEdgeRight]);
-YG_NODE_LAYOUT_PROPERTY_IMPL(float, Bottom, position[YGEdgeBottom]);
-YG_NODE_LAYOUT_PROPERTY_IMPL(float, Width, dimensions[YGDimensionWidth]);
-YG_NODE_LAYOUT_PROPERTY_IMPL(float, Height, dimensions[YGDimensionHeight]);
-YG_NODE_LAYOUT_PROPERTY_IMPL(YGDirection, Direction, direction);
-YG_NODE_LAYOUT_PROPERTY_IMPL(bool, HadOverflow, hadOverflow);
-
-YG_NODE_LAYOUT_RESOLVED_PROPERTY_IMPL(float, Margin, margin);
-YG_NODE_LAYOUT_RESOLVED_PROPERTY_IMPL(float, Border, border);
-YG_NODE_LAYOUT_RESOLVED_PROPERTY_IMPL(float, Padding, padding);
 
 bool YGNodeLayoutGetDidLegacyStretchFlagAffectLayout(node: YGNode) {
   return node.getLayout().doesLegacyStretchFlagAffectsLayout;
