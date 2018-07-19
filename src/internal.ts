@@ -56,8 +56,9 @@ export function YGRoundValueToPixelGrid(value: number, pointScaleFactor: number,
     return 0;
 }
 
-export let trailing: [YGEdge, YGEdge, YGEdge, YGEdge];
-export let leading: [YGEdge, YGEdge, YGEdge, YGEdge];
+export const trailing: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Bottom, YGEdge.Top, YGEdge.Right, YGEdge.Left];
+export const leading: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
+export const pos: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
 
 export const YGUndefined: number = undefined;
 export const YGValueUndefined: YGValue = new YGValue(YGUndefined, YGUnit.Undefined);

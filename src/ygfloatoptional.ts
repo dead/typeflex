@@ -5,8 +5,14 @@ import {
 class YGFloatOptional {
     private value_: number;
     private isUndefined_: boolean;
+    
+    constructor(value: number|YGFloatOptional = undefined) {
+        if (value instanceof YGFloatOptional) {
+            this.value_ = value.getValue();
+            this.isUndefined_ = value.isUndefined();
+            return;
+        }
 
-    constructor(value: number = undefined) {
         if (YGFloatIsUndefined(value)) {
             this.value_ = 0;
             this.isUndefined_ = true;
@@ -76,7 +82,10 @@ class YGFloatOptional {
     }
 
     isEqualValue(val: number): boolean {
-        return val === this.value_;
+        if (YGFloatIsUndefined(val) == this.isUndefined_) {
+            return this.isUndefined_ || val == this.value_;
+        }
+        return false;
     }
 
     isDiffValue(val: number): boolean {
