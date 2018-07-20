@@ -76,6 +76,21 @@ class YGLayout {
     diff(layout: YGLayout): boolean {
         return !this.equal(layout);
     }
+
+    clean(): void {
+        this.dimensions = kYGDefaultDimensionValues;
+        this.direction = YGDirection.Inherit;
+        this.computedFlexBasisGeneration = 0;
+        this.computedFlexBasis = new YGFloatOptional();
+        this.hadOverflow = false;
+        this.generationCount = 0;
+        this.lastOwnerDirection = YGDirection.RTL;
+        this.nextCachedMeasurementsIndex = 0;
+        this.measuredDimensions = kYGDefaultDimensionValues;
+        this.cachedLayout = new YGCachedMeasurement();
+        this.didUseLegacyFlag = false;
+        this.doesLegacyStretchFlagAffectsLayout = false;
+    }
 }
 
 export {

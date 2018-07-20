@@ -1,510 +1,3 @@
-void YGNodeAbsoluteLayoutChild(node: YGNode,
-                                      child: YGNode,
-                                      float width,
-                                      YGMeasureMode widthMode,
-                                      float height,
-                                      YGDirection direction,
-                                      YGConfig config) {
-  YGFlexDirection mainAxis =
-      YGResolveFlexDirection(node.getStyle().flexDirection, direction);
-  YGFlexDirection crossAxis = YGFlexDirectionCross(mainAxis, direction);
-  bool isMainAxisRow = YGFlexDirectionIsRow(mainAxis);
-
-  float childWidth = YGUndefined;
-  float childHeight = YGUndefined;
-  YGMeasureMode childWidthMeasureMode = YGMeasureMode.Undefined;
-  YGMeasureMode childHeightMeasureMode = YGMeasureMode.Undefined;
-
-  float marginRow =
-      YGUnwrapFloatOptional(child.getMarginForAxis(YGFlexDirection.Row, width));
-  float marginColumn = YGUnwrapFloatOptional(
-      child.getMarginForAxis(YGFlexDirection.Column, width));
-
-  if (YGNodeIsStyleDimDefined(child, YGFlexDirection.Row, width)) {
-    childWidth =
-        YGUnwrapFloatOptional(YGResolveValue(child.getResolvedDimension(YGDimension.Width), width)) +
-        marginRow;
-  } else {    if (child.isLeadingPositionDefined(YGFlexDirection.Row) 
-        child.isTrailingPosDefined(YGFlexDirection.Row)) {
-      childWidth = node.getLayout().measuredDimensions[YGDimension.Width] -
-          (node.getLeadingBorder(YGFlexDirection.Row) +
-           node.getTrailingBorder(YGFlexDirection.Row)) -
-          YGUnwrapFloatOptional(
-                       child.getLeadingPosition(YGFlexDirection.Row, width) +
-                       child.getTrailingPosition(YGFlexDirection.Row, width));
-      childWidth = YGNodeBoundAxis(child, YGFlexDirection.Row, childWidth, width, width);
-    }
-  }
-
-  if (YGNodeIsStyleDimDefined(child, YGFlexDirection.Column, height)) {
-    childHeight =
-        YGUnwrapFloatOptional(YGResolveValue(child.getResolvedDimension(YGDimension.Height), height)) +
-        marginColumn;
-  } else {    if (child.isLeadingPositionDefined(YGFlexDirection.Column) 
-        child.isTrailingPosDefined(YGFlexDirection.Column)) {
-      childHeight =
-          node.getLayout().measuredDimensions[YGDimension.Height] -
-          (node.getLeadingBorder(YGFlexDirection.Column) +
-           node.getTrailingBorder(YGFlexDirection.Column)) -
-          YGUnwrapFloatOptional(
-              child.getLeadingPosition(YGFlexDirection.Column, height) +
-              child.getTrailingPosition(YGFlexDirection.Column, height));
-      childHeight = YGNodeBoundAxis(child, YGFlexDirection.Column, childHeight, height, width);
-    }
-  }  if (YGFloatIsUndefined(childWidth) ^ YGFloatIsUndefined(childHeight)) {
-    if (!child.getStyle().aspectRatio.isUndefined()) {
-      if (YGFloatIsUndefined(childWidth)) {
-        childWidth = marginRow +
-            (childHeight - marginColumn) *
-                child.getStyle().aspectRatio.getValue();
-      } else if (YGFloatIsUndefined(childHeight)) {
-        childHeight = marginColumn +
-            (childWidth - marginRow) / child.getStyle().aspectRatio.getValue();
-      }
-    }
-  }  if (YGFloatIsUndefined(childWidth) || YGFloatIsUndefined(childHeight)) {
-    childWidthMeasureMode =
-        YGFloatIsUndefined(childWidth) ? YGMeasureMode.Undefined : YGMeasureMode.Exactly;
-    childHeightMeasureMode =
-        YGFloatIsUndefined(childHeight) ? YGMeasureMode.Undefined : YGMeasureMode.Exactly;    if (!isMainAxisRow  YGFloatIsUndefined(childWidth) 
-        widthMode != YGMeasureMode.Undefined  !YGFloatIsUndefined(width) 
-        width > 0) {
-      childWidth = width;
-      childWidthMeasureMode = YGMeasureMode.AtMost;
-    }
-
-    YGLayoutNodeInternal(child,
-                         childWidth,
-                         childHeight,
-                         direction,
-                         childWidthMeasureMode,
-                         childHeightMeasureMode,
-                         childWidth,
-                         childHeight,
-                         false,
-                         "abs-measure",
-                         config);
-    childWidth = child.getLayout().measuredDimensions[YGDimension.Width] +
-        YGUnwrapFloatOptional(
-                     child.getMarginForAxis(YGFlexDirection.Row, width));
-    childHeight = child.getLayout().measuredDimensions[YGDimension.Height] +
-        YGUnwrapFloatOptional(
-                      child.getMarginForAxis(YGFlexDirection.Column, width));
-  }
-
-  YGLayoutNodeInternal(child,
-                       childWidth,
-                       childHeight,
-                       direction,
-                       YGMeasureMode.Exactly,
-                       YGMeasureMode.Exactly,
-                       childWidth,
-                       childHeight,
-                       true,
-                       "abs-layout",
-                       config);
-
-  if (child.isTrailingPosDefined(mainAxis) 
-      !child.isLeadingPositionDefined(mainAxis)) {
-    child.setLayoutPosition(
-        node.getLayout().measuredDimensions[dim[mainAxis]] -
-            child.getLayout().measuredDimensions[dim[mainAxis]] -
-            node.getTrailingBorder(mainAxis) -
-            YGUnwrapFloatOptional(child.getTrailingMargin(mainAxis, width)) -
-            YGUnwrapFloatOptional(child.getTrailingPosition(
-                mainAxis, isMainAxisRow ? width : height)),
-        leading[mainAxis]);
-  } else if (
-      !child.isLeadingPositionDefined(mainAxis) 
-      node.getStyle().justifyContent == YGJustifyCenter) {
-    child.setLayoutPosition(
-        (node.getLayout().measuredDimensions[dim[mainAxis]] -
-         child.getLayout().measuredDimensions[dim[mainAxis]]) /
-            2.0f,
-        leading[mainAxis]);
-  } else if (
-      !child.isLeadingPositionDefined(mainAxis) 
-      node.getStyle().justifyContent == YGJustifyFlexEnd) {
-    child.setLayoutPosition(
-        (node.getLayout().measuredDimensions[dim[mainAxis]] -
-         child.getLayout().measuredDimensions[dim[mainAxis]]),
-        leading[mainAxis]);
-  }
-
-  if (child.isTrailingPosDefined(crossAxis) 
-      !child.isLeadingPositionDefined(crossAxis)) {
-    child.setLayoutPosition(
-        node.getLayout().measuredDimensions[dim[crossAxis]] -
-            child.getLayout().measuredDimensions[dim[crossAxis]] -
-            node.getTrailingBorder(crossAxis) -
-            YGUnwrapFloatOptional(child.getTrailingMargin(crossAxis, width)) -
-            YGUnwrapFloatOptional(child.getTrailingPosition(
-                crossAxis, isMainAxisRow ? height : width)),
-        leading[crossAxis]);
-
-  } else if (
-      !child.isLeadingPositionDefined(crossAxis) 
-      YGNodeAlignItem(node, child) == YGAlignCenter) {
-    child.setLayoutPosition(
-        (node.getLayout().measuredDimensions[dim[crossAxis]] -
-         child.getLayout().measuredDimensions[dim[crossAxis]]) /
-            2.0f,
-        leading[crossAxis]);
-  } else if (
-      !child.isLeadingPositionDefined(crossAxis) 
-      ((YGNodeAlignItem(node, child) == YGAlign.FlexEnd) ^
-       (node.getStyle().flexWrap == YGWrapWrapReverse))) {
-    child.setLayoutPosition(
-        (node.getLayout().measuredDimensions[dim[crossAxis]] -
-         child.getLayout().measuredDimensions[dim[crossAxis]]),
-        leading[crossAxis]);
-  }
-}
-
-void YGNodeWithMeasureFuncSetMeasuredDimensions(node: YGNode,
-                                                       float availableWidth,
-                                                       float availableHeight,
-                                                       YGMeasureMode widthMeasureMode,
-                                                       YGMeasureMode heightMeasureMode,
-                                                       float ownerWidth,
-                                                       float ownerHeight) {
-  YGAssertWithNode(
-      node,
-      node.getMeasure() != null,
-      "Expected node to have custom measure function");
-
-  float paddingAndBorderAxisRow =
-      YGNodePaddingAndBorderForAxis(node, YGFlexDirection.Row, availableWidth);
-  float paddingAndBorderAxisColumn =
-      YGNodePaddingAndBorderForAxis(node, YGFlexDirection.Column, availableWidth);
-  float marginAxisRow = YGUnwrapFloatOptional(
-      node.getMarginForAxis(YGFlexDirection.Row, availableWidth));
-  float marginAxisColumn = YGUnwrapFloatOptional(
-      node.getMarginForAxis(YGFlexDirection.Column, availableWidth));  float innerWidth = YGFloatIsUndefined(availableWidth)
-      ? availableWidth
-      : YGFloatMax(0, availableWidth - marginAxisRow - paddingAndBorderAxisRow);
-  float innerHeight = YGFloatIsUndefined(availableHeight)
-      ? availableHeight
-      : YGFloatMax(
-            0, availableHeight - marginAxisColumn - paddingAndBorderAxisColumn);
-
-  if (widthMeasureMode == YGMeasureMode.Exactly 
-      heightMeasureMode == YGMeasureMode.Exactly) {
-
-    node.setLayoutMeasuredDimension(
-        YGNodeBoundAxis(
-            node,
-            YGFlexDirection.Row,
-            availableWidth - marginAxisRow,
-            ownerWidth,
-            ownerWidth),
-        YGDimension.Width);
-    node.setLayoutMeasuredDimension(
-        YGNodeBoundAxis(
-            node,
-            YGFlexDirection.Column,
-            availableHeight - marginAxisColumn,
-            ownerHeight,
-            ownerWidth),
-        YGDimension.Height);
-  } else {
-
-    YGSize measuredSize = node.getMeasure()(
-        node, innerWidth, widthMeasureMode, innerHeight, heightMeasureMode);
-
-    node.setLayoutMeasuredDimension(
-        YGNodeBoundAxis(
-            node,
-            YGFlexDirection.Row,
-            (widthMeasureMode == YGMeasureMode.Undefined ||
-             widthMeasureMode == YGMeasureMode.AtMost)
-                ? measuredSize.width + paddingAndBorderAxisRow
-                : availableWidth - marginAxisRow,
-            ownerWidth,
-            ownerWidth),
-        YGDimension.Width);
-
-    node.setLayoutMeasuredDimension(
-        YGNodeBoundAxis(
-            node,
-            YGFlexDirection.Column,
-            (heightMeasureMode == YGMeasureMode.Undefined ||
-             heightMeasureMode == YGMeasureMode.AtMost)
-                ? measuredSize.height + paddingAndBorderAxisColumn
-                : availableHeight - marginAxisColumn,
-            ownerHeight,
-            ownerWidth),
-        YGDimension.Height);
-  }
-}
-void YGNodeEmptyContainerSetMeasuredDimensions(node: YGNode,
-                                                      float availableWidth,
-                                                      float availableHeight,
-                                                      YGMeasureMode widthMeasureMode,
-                                                      YGMeasureMode heightMeasureMode,
-                                                      float ownerWidth,
-                                                      float ownerHeight) {
-  float paddingAndBorderAxisRow =
-      YGNodePaddingAndBorderForAxis(node, YGFlexDirection.Row, ownerWidth);
-  float paddingAndBorderAxisColumn =
-      YGNodePaddingAndBorderForAxis(node, YGFlexDirection.Column, ownerWidth);
-  float marginAxisRow = YGUnwrapFloatOptional(
-      node.getMarginForAxis(YGFlexDirection.Row, ownerWidth));
-  float marginAxisColumn = YGUnwrapFloatOptional(
-      node.getMarginForAxis(YGFlexDirection.Column, ownerWidth));
-
-  node.setLayoutMeasuredDimension(
-      YGNodeBoundAxis(
-          node,
-          YGFlexDirection.Row,
-          (widthMeasureMode == YGMeasureMode.Undefined ||
-           widthMeasureMode == YGMeasureMode.AtMost)
-              ? paddingAndBorderAxisRow
-              : availableWidth - marginAxisRow,
-          ownerWidth,
-          ownerWidth),
-      YGDimension.Width);
-
-  node.setLayoutMeasuredDimension(
-      YGNodeBoundAxis(
-          node,
-          YGFlexDirection.Column,
-          (heightMeasureMode == YGMeasureMode.Undefined ||
-           heightMeasureMode == YGMeasureMode.AtMost)
-              ? paddingAndBorderAxisColumn
-              : availableHeight - marginAxisColumn,
-          ownerHeight,
-          ownerWidth),
-      YGDimension.Height);
-}
-
-bool YGNodeFixedSizeSetMeasuredDimensions(YGNodenode,
-                                                 float availableWidth,
-                                                 float availableHeight,
-                                                 YGMeasureMode widthMeasureMode,
-                                                 YGMeasureMode heightMeasureMode,
-                                                 float ownerWidth,
-                                                 float ownerHeight) {
-  if ((!YGFloatIsUndefined(availableWidth) 
-       widthMeasureMode == YGMeasureMode.AtMost  availableWidth <= 0.0f) ||
-      (!YGFloatIsUndefined(availableHeight) 
-       heightMeasureMode == YGMeasureMode.AtMost  availableHeight <= 0.0f) ||
-      (widthMeasureMode == YGMeasureMode.Exactly 
-       heightMeasureMode == YGMeasureMode.Exactly)) {
-    float marginAxisColumn = YGUnwrapFloatOptional(
-        node.getMarginForAxis(YGFlexDirection.Column, ownerWidth));
-    float marginAxisRow = YGUnwrapFloatOptional(
-        node.getMarginForAxis(YGFlexDirection.Row, ownerWidth));
-
-    node.setLayoutMeasuredDimension(
-        YGNodeBoundAxis(
-            node,
-            YGFlexDirection.Row,
-            YGFloatIsUndefined(availableWidth) ||
-                    (widthMeasureMode == YGMeasureMode.AtMost 
-                     availableWidth < 0.0f)
-                ? 0.0f
-                : availableWidth - marginAxisRow,
-            ownerWidth,
-            ownerWidth),
-        YGDimension.Width);
-
-    node.setLayoutMeasuredDimension(
-        YGNodeBoundAxis(
-            node,
-            YGFlexDirection.Column,
-            YGFloatIsUndefined(availableHeight) ||
-                    (heightMeasureMode == YGMeasureMode.AtMost 
-                     availableHeight < 0.0f)
-                ? 0.0f
-                : availableHeight - marginAxisColumn,
-            ownerHeight,
-            ownerWidth),
-        YGDimension.Height);
-    return true;
-  }
-
-  return false;
-}
-
-void YGZeroOutLayoutRecursivly(node: YGNode) {
-  memset((node.getLayout()), 0, sizeof(YGLayout));
-  node.setHasNewLayout(true);
-  node.cloneChildrenIfNeeded();
-  childCount = YGNodeGetChildCount(node);
-  for (i = 0; i < childCount; i++) {
-    child: YGNode = node.getChild(i);
-    YGZeroOutLayoutRecursivly(child);
-  }
-}
-
-float YGNodeCalculateAvailableInnerDim(
-    node: YGNode,
-    YGFlexDirection axis,
-    float availableDim,
-    float ownerDim) {
-  YGFlexDirection direction =
-      YGFlexDirectionIsRow(axis) ? YGFlexDirection.Row : YGFlexDirection.Column;
-  YGDimension dimension =
-      YGFlexDirectionIsRow(axis) ? YGDimension.Width : YGDimension.Height;
-
-  float margin =
-      YGUnwrapFloatOptional(node.getMarginForAxis(direction, ownerDim));
-  float paddingAndBorder =
-      YGNodePaddingAndBorderForAxis(node, direction, ownerDim);
-
-  float availableInnerDim = availableDim - margin - paddingAndBorder;  if (!YGFloatIsUndefined(availableInnerDim)) {    YGFloatOptional minDimensionOptional = YGResolveValue(node.getStyle().minDimensions[dimension], ownerDim);
-    float minInnerDim = minDimensionOptional.isUndefined()
-        ? 0.0f
-        : minDimensionOptional.getValue() - paddingAndBorder;
-
-    YGFloatOptional maxDimensionOptional = YGResolveValue(node.getStyle().maxDimensions[dimension], ownerDim) ;
-
-    float maxInnerDim = maxDimensionOptional.isUndefined()
-        ? FLT_MAX
-        : maxDimensionOptional.getValue() - paddingAndBorder;
-    availableInnerDim =
-        YGFloatMax(YGFloatMin(availableInnerDim, maxInnerDim), minInnerDim);
-  }
-
-  return availableInnerDim;
-}
-
-void YGNodeComputeFlexBasisForChildren(
-    node: YGNode,
-    float availableInnerWidth,
-    float availableInnerHeight,
-    YGMeasureMode widthMeasureMode,
-    YGMeasureMode heightMeasureMode,
-    YGDirection direction,
-    YGFlexDirection mainAxis,
-    YGConfig config,
-    bool performLayout,
-    float totalOuterFlexBasis) {
-  singleFlexChild: YGNode = null;
-  YGVector children = node.getChildren();
-  YGMeasureMode measureModeMainDim =
-      YGFlexDirectionIsRow(mainAxis) ? widthMeasureMode : heightMeasureMode;  if (measureModeMainDim == YGMeasureMode.Exactly) {
-    for (auto child : children) {
-      if (singleFlexChild != null) {
-        if (child.isNodeFlexible()) {
-
-          singleFlexChild = null;
-          break;
-        }
-      } else if (
-          child.resolveFlexGrow() > 0.0f 
-          child.resolveFlexShrink() > 0.0f) {
-        singleFlexChild = child;
-      }
-    }
-  }
-
-  for (auto child : children) {
-    child.resolveDimension();
-    if (child.getStyle().display == YGDisplay.None) {
-      YGZeroOutLayoutRecursivly(child);
-      child.setHasNewLayout(true);
-      child.setDirty(false);
-      continue;
-    }
-    if (performLayout) {
-
-      YGDirection childDirection = child.resolveDirection(direction);
-      float mainDim = YGFlexDirectionIsRow(mainAxis)
-          ? availableInnerWidth
-          : availableInnerHeight;
-      float crossDim = YGFlexDirectionIsRow(mainAxis)
-          ? availableInnerHeight
-          : availableInnerWidth;
-      child.setPosition(
-          childDirection, mainDim, crossDim, availableInnerWidth);
-    }
-
-    if (child.getStyle().positionType == YGPositionType.Absolute) {
-      continue;
-    }
-    if (child == singleFlexChild) {
-      child.setLayoutComputedFlexBasisGeneration(gCurrentGenerationCount);
-      child.setLayoutComputedFlexBasis(YGFloatOptional(0));
-    } else {
-      YGNodeComputeFlexBasisForChild(
-          node,
-          child,
-          availableInnerWidth,
-          widthMeasureMode,
-          availableInnerHeight,
-          availableInnerWidth,
-          availableInnerHeight,
-          heightMeasureMode,
-          direction,
-          config);
-    }
-
-    totalOuterFlexBasis += YGUnwrapFloatOptional(
-        child.getLayout().computedFlexBasis +
-        child.getMarginForAxis(mainAxis, availableInnerWidth));
-  }
-}
-YGCollectFlexItemsRowValues YGCalculateCollectFlexItemsRowValues(
-    YGNode node,
-    YGDirection ownerDirection,
-    float mainAxisownerSize,
-    float availableInnerWidth,
-    float availableInnerMainDim,
-    startOfLineIndex,
-    lineCount) {
-  YGCollectFlexItemsRowValues flexAlgoRowMeasurement = {};
-  flexAlgoRowMeasurement.relativeChildren.reserve(node.getChildren().size());
-
-  float sizeConsumedOnCurrentLineIncludingMinConstraint = 0;
-  YGFlexDirection mainAxis = YGResolveFlexDirection(
-      node.getStyle().flexDirection, node.resolveDirection(ownerDirection));
-  bool isNodeFlexWrap = node.getStyle().flexWrap != YGWrapNoWrap;  endOfLineIndex = startOfLineIndex;
-  for (; endOfLineIndex < node.getChildrenCount(); endOfLineIndex++) {
-    child: YGNode = node.getChild(endOfLineIndex);
-    if (child.getStyle().display == YGDisplay.None ||
-        child.getStyle().positionType == YGPositionType.Absolute) {
-      continue;
-    }
-    child.setLineIndex(lineCount);
-    float childMarginMainAxis = YGUnwrapFloatOptional(
-        child.getMarginForAxis(mainAxis, availableInnerWidth));
-    float flexBasisWithMinAndMaxConstraints =
-        YGUnwrapFloatOptional(YGNodeBoundAxisWithinMinAndMax(
-            child,
-            mainAxis,
-            YGUnwrapFloatOptional(child.getLayout().computedFlexBasis),
-            mainAxisownerSize));    if (sizeConsumedOnCurrentLineIncludingMinConstraint +
-                flexBasisWithMinAndMaxConstraints + childMarginMainAxis >
-            availableInnerMainDim 
-        isNodeFlexWrap  flexAlgoRowMeasurement.itemsOnLine > 0) {
-      break;
-    }
-
-    sizeConsumedOnCurrentLineIncludingMinConstraint +=
-        flexBasisWithMinAndMaxConstraints + childMarginMainAxis;
-    flexAlgoRowMeasurement.sizeConsumedOnCurrentLine +=
-        flexBasisWithMinAndMaxConstraints + childMarginMainAxis;
-    flexAlgoRowMeasurement.itemsOnLine++;
-
-    if (child.isNodeFlexible()) {
-      flexAlgoRowMeasurement.totalFlexGrowFactors += child.resolveFlexGrow();      flexAlgoRowMeasurement.totalFlexShrinkScaledFactors +=
-          -child.resolveFlexShrink() *
-          YGUnwrapFloatOptional(child.getLayout().computedFlexBasis);
-    }
-
-    flexAlgoRowMeasurement.relativeChildren.push_back(child);
-  }  if (flexAlgoRowMeasurement.totalFlexGrowFactors > 0 
-      flexAlgoRowMeasurement.totalFlexGrowFactors < 1) {
-    flexAlgoRowMeasurement.totalFlexGrowFactors = 1;
-  }  if (flexAlgoRowMeasurement.totalFlexShrinkScaledFactors > 0 
-      flexAlgoRowMeasurement.totalFlexShrinkScaledFactors < 1) {
-    flexAlgoRowMeasurement.totalFlexShrinkScaledFactors = 1;
-  }
-  flexAlgoRowMeasurement.endOfLineIndex = endOfLineIndex;
-  return flexAlgoRowMeasurement;
-}
 float YGDistributeFreeSpaceSecondPass(
     YGCollectFlexItemsRowValues collectedFlexItemsValues,
     node: YGNode,
@@ -524,7 +17,7 @@ float YGDistributeFreeSpaceSecondPass(
   float flexGrowFactor = 0;
   float deltaFreeSpace = 0;
   bool isMainAxisRow = YGFlexDirectionIsRow(mainAxis);
-  bool isNodeFlexWrap = node.getStyle().flexWrap != YGWrapNoWrap;
+  bool isNodeFlexWrap = node.getStyle().flexWrap != YGWrap.NoWrap;
 
   for (auto currentRelativeChild : collectedFlexItemsValues.relativeChildren) {
     childFlexBasis = YGUnwrapFloatOptional(YGNodeBoundAxisWithinMinAndMax(
@@ -833,13 +326,13 @@ void YGJustifyMainAxis(
 
   if (numberOfAutoMarginsOnCurrentLine == 0) {
     switch (justifyContent) {
-      case YGJustifyCenter:
+      case YGJustify.Center:
         leadingMainDim = collectedFlexItemsValues.remainingFreeSpace / 2;
         break;
-      case YGJustifyFlexEnd:
+      case YGJustify.FlexEnd:
         leadingMainDim = collectedFlexItemsValues.remainingFreeSpace;
         break;
-      case YGJustifySpaceBetween:
+      case YGJustify.SpaceBetween:
         if (collectedFlexItemsValues.itemsOnLine > 1) {
           betweenMainDim =
               YGFloatMax(collectedFlexItemsValues.remainingFreeSpace, 0) /
@@ -848,19 +341,19 @@ void YGJustifyMainAxis(
           betweenMainDim = 0;
         }
         break;
-      case YGJustifySpaceEvenly:
+      case YGJustify.SpaceEvenly:
 
         betweenMainDim = collectedFlexItemsValues.remainingFreeSpace /
             (collectedFlexItemsValues.itemsOnLine + 1);
         leadingMainDim = betweenMainDim;
         break;
-      case YGJustifySpaceAround:
+      case YGJustify.SpaceAround:
 
         betweenMainDim = collectedFlexItemsValues.remainingFreeSpace /
             collectedFlexItemsValues.itemsOnLine;
         leadingMainDim = betweenMainDim / 2;
         break;
-      case YGJustifyFlexStart:
+      case YGJustify.FlexStart:
         break;
     }
   }
@@ -1033,7 +526,7 @@ void YGNodelayoutImpl(node: YGNode,
       YGResolveFlexDirection(node.getStyle().flexDirection, direction);
   YGFlexDirection crossAxis = YGFlexDirectionCross(mainAxis, direction);
   bool isMainAxisRow = YGFlexDirectionIsRow(mainAxis);
-  bool isNodeFlexWrap = node.getStyle().flexWrap != YGWrapNoWrap;
+  bool isNodeFlexWrap = node.getStyle().flexWrap != YGWrap.NoWrap;
 
   float mainAxisownerSize = isMainAxisRow ? ownerWidth : ownerHeight;
   float crossAxisownerSize = isMainAxisRow ? ownerHeight : ownerWidth;
@@ -1562,7 +1055,7 @@ void YGNodelayoutImpl(node: YGNode,
                     crossAxisownerSize))),
             paddingAndBorderAxisCross),
         dim[crossAxis]);
-  }  if (performLayout  node.getStyle().flexWrap == YGWrapWrapReverse) {
+  }  if (performLayout  node.getStyle().flexWrap == YGWrap.WrapReverse) {
     for (i = 0; i < childCount; i++) {
       child: YGNode = YGNodeGetChild(node, i);
       if (child.getStyle().positionType == YGPositionType.Relative) {

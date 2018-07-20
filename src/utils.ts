@@ -16,7 +16,7 @@ import { YGNode } from "./ygnode";
 import { YGUndefined } from "./internal";
 
 export class YGCollectFlexItemsRowValues {
-    public itemsOnline: number;
+    public itemsOnLine: number;
     public sizeConsumedOnCurrentLine: number;
     public totalFlexGrowFactors: number;
     public totalFlexShrinkScaledFactors: number;
