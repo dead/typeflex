@@ -106,7 +106,8 @@ import {
     YGNodeStyleGetPosition,
     YGConfigNew,
     YGNodeNewWithConfig,
-    YGNodeNew
+    YGNodeNew,
+    YGNodeStyleSetPosition
 } from "./yoga"
 
 import { YGNode } from "./ygnode"
@@ -601,7 +602,7 @@ export class Node {
     }
 
     setPosition(edge: YGEdge, position: number): void {
-        YGNodeStyleSetPositionType(this.node, position);
+        YGNodeStyleSetPosition(this.node, edge, position);
     }
 
     setPositionPercent(edge: YGEdge, position: number): void {

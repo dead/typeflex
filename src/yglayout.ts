@@ -7,6 +7,14 @@ import { YGFloatIsUndefined } from "./yoga";
 const kYGDefaultDimensionValues: () => [number, number] = () => [undefined, undefined];
 const YG_MAX_CACHED_RESULT_COUNT: number = 16;
 
+function buildCache(c: number): Array<YGCachedMeasurement> {
+    let ret: Array<YGCachedMeasurement> = [];
+    for(let i = 0; i < c; i++) {
+        ret.push(new YGCachedMeasurement());
+    }
+    return ret;
+}
+
 class YGLayout {
     public position: [number, number, number, number];
     public dimensions: [number, number];
@@ -47,7 +55,7 @@ class YGLayout {
         this.margin = [undefined, undefined, undefined, undefined, undefined, undefined];
         this.border = [undefined, undefined, undefined, undefined, undefined, undefined];
         this.padding = [undefined, undefined, undefined, undefined, undefined, undefined];
-        this.cachedMeasurements = new Array(YG_MAX_CACHED_RESULT_COUNT);
+        this.cachedMeasurements = buildCache(YG_MAX_CACHED_RESULT_COUNT);
     }
 
     equal(layout: YGLayout) : boolean {
@@ -99,6 +107,7 @@ class YGLayout {
         this.margin = [undefined, undefined, undefined, undefined, undefined, undefined];
         this.border = [undefined, undefined, undefined, undefined, undefined, undefined];
         this.padding = [undefined, undefined, undefined, undefined, undefined, undefined];
+        this.cachedMeasurements = buildCache(YG_MAX_CACHED_RESULT_COUNT);
     }
 }
 

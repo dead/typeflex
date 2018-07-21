@@ -364,7 +364,7 @@ class YGNode {
         }
         else {
             //YGAssertWithNode(this, this.children_.size() == 0, "Cannot set measure function: Nodes with measure functions cannot have children.");
-            if (this.children_.length == 0) {
+            if (this.children_.length != 0) {
                 console.error("Cannot set measure function: Nodes with measure functions cannot have children.");
             }
             this.measure_ = measureFunc;
