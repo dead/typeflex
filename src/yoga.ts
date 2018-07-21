@@ -23,6 +23,7 @@ import { YGConfig } from "./ygconfig";
 import { YGLayout } from "./yglayout";
 import { YGStyle } from "./ygstyle";
 import { YGFloatOptional } from "./ygfloatoptional";
+import { YGValue } from "./ygvalue";
 
 import {
     YGFloatSanitize,
@@ -40,11 +41,9 @@ import {
 } from "./utils";
 
 import {
-    YGValueUndefined,
     kDefaultFlexGrow,
     kWebDefaultFlexShrink,
     kDefaultFlexShrink,
-    YGUndefined,
     pos,
     trailing,
     leading,
@@ -57,15 +56,10 @@ export class YGSize {
     public height: number;
 }
 
-export class YGValue {
-    public value: number|undefined;
-    public unit: YGUnit;
-
-    constructor(value: number|undefined, unit: YGUnit) {
-        this.value = value;
-        this.unit = unit;
-    }
-}
+export const YGUndefined: number = undefined;
+export const YGValueUndefined: YGValue = new YGValue(YGUndefined, YGUnit.Undefined);
+export const YGValueAuto: YGValue = new YGValue(YGUndefined, YGUnit.Auto);
+export const YGValueZero: YGValue = new YGValue(0, YGUnit.Point);
 
 export interface YGPrintFunc { (node: YGNode): void };
 export interface YGMeasureFunc { (node: YGNode, width: number, widthMode: YGMeasureMode, height: number, heightMode: YGMeasureMode): YGSize };
@@ -1898,7 +1892,7 @@ export function YGCalculateCollectFlexItemsRowValues(
     startOfLineIndex: number,
     lineCount: number): YGCollectFlexItemsRowValues {
     const flexAlgoRowMeasurement: YGCollectFlexItemsRowValues = new YGCollectFlexItemsRowValues();
-    flexAlgoRowMeasurement.relativeChildren = new Array(node.getChildren().length);
+    //flexAlgoRowMeasurement.relativeChildren = new Array(node.getChildren().length);
 
     let sizeConsumedOnCurrentLineIncludingMinConstraint: number = 0;
     const mainAxis: YGFlexDirection = YGResolveFlexDirection(node.getStyle().flexDirection, node.resolveDirection(ownerDirection));
@@ -3807,47 +3801,3 @@ export function YGTraversePreOrder(node: YGNode, f: (node: YGNode) => void): voi
   f(node);
   YGTraverseChildrenPreOrder(node.getChildren(), f);
 }
-
-function ASSERT_FLOAT_EQ(x: number, y: number) {
-    console.assert(x === y)
-}
-
-const config: YGConfig = YGConfigNew();
-const root: YGNode = YGNodeNewWithConfig(config);
-YGNodeStyleSetWidth(root, 100);
-YGNodeStyleSetHeight(root, 100);
-
-const root_child0: YGNode = YGNodeNewWithConfig(config);
-YGNodeStyleSetPositionType(root_child0, YGPositionType.Absolute);
-YGNodeStyleSetPosition(root_child0, YGEdge.Start, 10);
-YGNodeStyleSetPosition(root_child0, YGEdge.Top, 10);
-YGNodeStyleSetWidth(root_child0, 10);
-YGNodeStyleSetHeight(root_child0, 10);
-YGNodeInsertChild(root, root_child0, 0);
-YGNodeCalculateLayout(root, YGUndefined, YGUndefined, YGDirection.LTR);
-
-ASSERT_FLOAT_EQ(0, YGNodeLayoutGetLeft(root));
-ASSERT_FLOAT_EQ(0, YGNodeLayoutGetTop(root));
-ASSERT_FLOAT_EQ(100, YGNodeLayoutGetWidth(root));
-ASSERT_FLOAT_EQ(100, YGNodeLayoutGetHeight(root));
-
-ASSERT_FLOAT_EQ(10, YGNodeLayoutGetLeft(root_child0));
-ASSERT_FLOAT_EQ(10, YGNodeLayoutGetTop(root_child0));
-ASSERT_FLOAT_EQ(10, YGNodeLayoutGetWidth(root_child0));
-ASSERT_FLOAT_EQ(10, YGNodeLayoutGetHeight(root_child0));
-
-YGNodeCalculateLayout(root, YGUndefined, YGUndefined, YGDirection.RTL);
-
-ASSERT_FLOAT_EQ(0, YGNodeLayoutGetLeft(root));
-ASSERT_FLOAT_EQ(0, YGNodeLayoutGetTop(root));
-ASSERT_FLOAT_EQ(100, YGNodeLayoutGetWidth(root));
-ASSERT_FLOAT_EQ(100, YGNodeLayoutGetHeight(root));
-
-ASSERT_FLOAT_EQ(80, YGNodeLayoutGetLeft(root_child0));
-ASSERT_FLOAT_EQ(10, YGNodeLayoutGetTop(root_child0));
-ASSERT_FLOAT_EQ(10, YGNodeLayoutGetWidth(root_child0));
-ASSERT_FLOAT_EQ(10, YGNodeLayoutGetHeight(root_child0));
-
-YGNodeFreeRecursive(root);
-YGConfigFree(config);
-

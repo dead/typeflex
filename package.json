@@ -1,6 +1,11 @@
 {
+  "license": "MIT",
   "dependencies": {
+    "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
-    "typescript": "^2.9.2"
-  }
+    "typescript": "^2.9.2",
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.1.0"
+  },
+  "build": "webpack --config webpack.config.js"
 }

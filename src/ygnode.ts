@@ -9,8 +9,10 @@ import {
     YGPositionType,
     YGAlign
 } from "./enums";
+
 import { YGFloatOptional } from "./ygfloatoptional";
 import { YGConfig } from "./ygconfig";
+
 import {
     YGFlexDirectionIsRow,
     YGResolveValue,
@@ -25,19 +27,17 @@ import {
 
 import { YGLayout } from "./yglayout";
 import { YGStyle } from "./ygstyle";
+import { YGValue } from "./ygvalue";
+
 import {
     trailing,
     leading,
-    YGValueUndefined,
-    YGValueZero,
-    YGValueAuto,
     kDefaultFlexGrow,
     kDefaultFlexShrink,
     kWebDefaultFlexShrink
 } from "./internal";
 
 import {
-    YGValue,
     YGComputedEdgeValue,
     YGFloatIsUndefined,
     YGPrintFunc,
@@ -45,7 +45,10 @@ import {
     YGBaselineFunc,
     YGDirtiedFunc,
     YGCloneNodeFunc,
-    YGNodeClone
+    YGNodeClone,
+    YGValueUndefined,
+    YGValueZero,
+    YGValueAuto,
 } from "./yoga";
 
 class YGNode {

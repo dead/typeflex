@@ -4,7 +4,7 @@ import { YGCachedMeasurement } from './internal';
 import { YGFloatArrayEqual } from "./utils";
 import { YGFloatIsUndefined } from "./yoga";
 
-const kYGDefaultDimensionValues: [number, number] = [undefined, undefined];
+const kYGDefaultDimensionValues: () => [number, number] = () => [undefined, undefined];
 const YG_MAX_CACHED_RESULT_COUNT: number = 16;
 
 class YGLayout {
@@ -31,7 +31,7 @@ class YGLayout {
     public doesLegacyStretchFlagAffectsLayout: boolean;
 
     constructor() {
-        this.dimensions = kYGDefaultDimensionValues;
+        this.dimensions = kYGDefaultDimensionValues();
         this.direction = YGDirection.Inherit;
         this.computedFlexBasisGeneration = 0;
         this.computedFlexBasis = new YGFloatOptional();
@@ -39,10 +39,15 @@ class YGLayout {
         this.generationCount = 0;
         this.lastOwnerDirection = YGDirection.RTL;
         this.nextCachedMeasurementsIndex = 0;
-        this.measuredDimensions = kYGDefaultDimensionValues;
+        this.measuredDimensions = kYGDefaultDimensionValues();
         this.cachedLayout = new YGCachedMeasurement();
         this.didUseLegacyFlag = false;
         this.doesLegacyStretchFlagAffectsLayout = false;
+        this.position = [undefined, undefined, undefined, undefined]
+        this.margin = [undefined, undefined, undefined, undefined, undefined, undefined];
+        this.border = [undefined, undefined, undefined, undefined, undefined, undefined];
+        this.padding = [undefined, undefined, undefined, undefined, undefined, undefined];
+        this.cachedMeasurements = new Array(YG_MAX_CACHED_RESULT_COUNT);
     }
 
     equal(layout: YGLayout) : boolean {
@@ -78,7 +83,7 @@ class YGLayout {
     }
 
     clean(): void {
-        this.dimensions = kYGDefaultDimensionValues;
+        this.dimensions = kYGDefaultDimensionValues();
         this.direction = YGDirection.Inherit;
         this.computedFlexBasisGeneration = 0;
         this.computedFlexBasis = new YGFloatOptional();
@@ -86,10 +91,14 @@ class YGLayout {
         this.generationCount = 0;
         this.lastOwnerDirection = YGDirection.RTL;
         this.nextCachedMeasurementsIndex = 0;
-        this.measuredDimensions = kYGDefaultDimensionValues;
+        this.measuredDimensions = kYGDefaultDimensionValues();
         this.cachedLayout = new YGCachedMeasurement();
         this.didUseLegacyFlag = false;
         this.doesLegacyStretchFlagAffectsLayout = false;
+        this.position = [undefined, undefined, undefined, undefined]
+        this.margin = [undefined, undefined, undefined, undefined, undefined, undefined];
+        this.border = [undefined, undefined, undefined, undefined, undefined, undefined];
+        this.padding = [undefined, undefined, undefined, undefined, undefined, undefined];
     }
 }
 

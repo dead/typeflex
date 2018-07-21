@@ -3,7 +3,7 @@ import {
     YGCloneNodeFunc
 } from "./yoga";
 
-const kYGDefaultExperimentalFeatures: Array<boolean> = [false, false, false];
+const kYGDefaultExperimentalFeatures: () => Array<boolean> = () => [false, false, false];
 
 class YGConfig {
     public experimentalFeatures: Array<boolean>;
@@ -16,7 +16,7 @@ class YGConfig {
     public context: any;
 
     constructor(logger: YGLogger) {
-        this.experimentalFeatures = kYGDefaultExperimentalFeatures;
+        this.experimentalFeatures = kYGDefaultExperimentalFeatures();
         this.useWebDefaults = false;
         this.useLegacyStretchBehaviour = false;
         this.shouldDiffLayoutWithoutLegacyStretchBehaviour = false;

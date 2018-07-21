@@ -16,27 +16,24 @@ import {
     YGValueArrayEqual
 } from "./utils";
 
-import {
-    YGValue
-} from "./yoga";
-
+import { YGValue } from "./ygvalue";
 import { YGFloatOptional } from "./ygfloatoptional";
 
-const kYGValueUndefined: YGValue = new YGValue(0, YGUnit.Undefined);
-const kYGValueAuto: YGValue = new YGValue(0, YGUnit.Auto);
-const kYGDefaultEdgeValuesUnit: Array<YGValue> = [
-    kYGValueUndefined,
-    kYGValueUndefined,
-    kYGValueUndefined,
-    kYGValueUndefined,
-    kYGValueUndefined,
-    kYGValueUndefined,
-    kYGValueUndefined,
-    kYGValueUndefined,
-    kYGValueUndefined
+const kYGValueUndefined: () => YGValue = () => new YGValue(0, YGUnit.Undefined);
+const kYGValueAuto: () => YGValue = () => new YGValue(0, YGUnit.Auto);
+const kYGDefaultEdgeValuesUnit: () => Array<YGValue> = () => [
+    kYGValueUndefined(),
+    kYGValueUndefined(),
+    kYGValueUndefined(),
+    kYGValueUndefined(),
+    kYGValueUndefined(),
+    kYGValueUndefined(),
+    kYGValueUndefined(),
+    kYGValueUndefined(),
+    kYGValueUndefined()
 ];
-const kYGDefaultDimensionValuesAutoUnit: [YGValue, YGValue] = [kYGValueAuto, kYGValueAuto];
-const kYGDefaultDimensionValuesUnit: [YGValue, YGValue] = [kYGValueUndefined, kYGValueUndefined];
+const kYGDefaultDimensionValuesAutoUnit: () => [YGValue, YGValue] = () => [kYGValueAuto(), kYGValueAuto()];
+const kYGDefaultDimensionValuesUnit: () => [YGValue, YGValue] = () => [kYGValueUndefined(), kYGValueUndefined()];
 
 class YGStyle {
     public direction: YGDirection;
@@ -76,14 +73,15 @@ class YGStyle {
         this.flex = new YGFloatOptional();  
         this.flexGrow = new YGFloatOptional();
         this.flexShrink = new YGFloatOptional();
-        this.flexBasis = kYGValueAuto;
-        this.margin = kYGDefaultEdgeValuesUnit;
-        this.position = kYGDefaultEdgeValuesUnit;
-        this.padding = kYGDefaultEdgeValuesUnit;
-        this.border = kYGDefaultEdgeValuesUnit;
-        this.dimensions = kYGDefaultDimensionValuesAutoUnit; 
-        this.minDimensions = kYGDefaultDimensionValuesUnit;
-        this.maxDimensions = kYGDefaultDimensionValuesUnit;
+        this.flexBasis = kYGValueAuto();
+        this.margin = kYGDefaultEdgeValuesUnit();
+        this.position = kYGDefaultEdgeValuesUnit();
+        this.padding = kYGDefaultEdgeValuesUnit();
+        this.border = kYGDefaultEdgeValuesUnit();
+        this.dimensions = kYGDefaultDimensionValuesAutoUnit(); 
+        this.minDimensions = kYGDefaultDimensionValuesUnit();
+        this.maxDimensions = kYGDefaultDimensionValuesUnit();
+        this.aspectRatio = new YGFloatOptional();
     }
 
     isEqual(style: YGStyle): boolean {

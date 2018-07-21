@@ -9,7 +9,6 @@ import { YGNode } from "./ygnode";
 
 import {
     YGFloatIsUndefined,
-    YGValue
 } from "./yoga";
 
 export class YGCachedMeasurement {
@@ -52,18 +51,9 @@ export class YGCachedMeasurement {
     }
 }
 
-export function YGRoundValueToPixelGrid(value: number, pointScaleFactor: number, forceCeil: boolean, forceFloor: boolean): number {
-    return 0;
-}
-
 export const trailing: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Bottom, YGEdge.Top, YGEdge.Right, YGEdge.Left];
 export const leading: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
 export const pos: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
-
-export const YGUndefined: number = undefined;
-export const YGValueUndefined: YGValue = new YGValue(YGUndefined, YGUnit.Undefined);
-export const YGValueAuto: YGValue = new YGValue(YGUndefined, YGUnit.Auto);
-export const YGValueZero: YGValue = new YGValue(0, YGUnit.Point);
 
 export const YG_MAX_CACHED_RESULT_COUNT: number = 16;
 export const kDefaultFlexGrow: number = 0.0;

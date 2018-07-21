@@ -8,12 +8,11 @@ import { YGFloatOptional } from './ygfloatoptional';
 
 import {
     YGFloatIsUndefined,
-    YGValue
+    YGUndefined
 } from "./yoga";
 
 import { YGNode } from "./ygnode";
-
-import { YGUndefined } from "./internal";
+import { YGValue } from "./ygvalue";
 
 export class YGCollectFlexItemsRowValues {
     public itemsOnLine: number = 0;
