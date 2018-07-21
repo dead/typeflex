@@ -12,7 +12,8 @@ class YGConfig {
     public shouldDiffLayoutWithoutLegacyStretchBehaviour: boolean;
     public pointScaleFactor: number;
     public logger: YGLogger;
-    public cloneNodeCallback: YGCloneNodeFunc;
+    public cloneNodeCallback: YGCloneNodeFunc = null;
+    public context: any;
 
     constructor(logger: YGLogger) {
         this.experimentalFeatures = kYGDefaultExperimentalFeatures;
@@ -21,6 +22,7 @@ class YGConfig {
         this.shouldDiffLayoutWithoutLegacyStretchBehaviour = false;
         this.pointScaleFactor = 1.0;
         this.logger = logger;
+        this.context = null;
     }
 }
 

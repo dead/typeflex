@@ -16,15 +16,15 @@ import { YGNode } from "./ygnode";
 import { YGUndefined } from "./internal";
 
 export class YGCollectFlexItemsRowValues {
-    public itemsOnLine: number;
-    public sizeConsumedOnCurrentLine: number;
-    public totalFlexGrowFactors: number;
-    public totalFlexShrinkScaledFactors: number;
-    public endOfLineIndex: number;
-    public relativeChildren: Array<YGNode>;
-    public remainingFreeSpace: number;
-    public mainDim: number;
-    public crossDim: number;
+    public itemsOnLine: number = 0;
+    public sizeConsumedOnCurrentLine: number = 0;
+    public totalFlexGrowFactors: number = 0;
+    public totalFlexShrinkScaledFactors: number = 0;
+    public endOfLineIndex: number = 0;
+    public relativeChildren: Array<YGNode> = [];
+    public remainingFreeSpace: number = 0;
+    public mainDim: number = 0;
+    public crossDim: number = 0;
 }
 
 export function YGValueEqual(a: YGValue, b: YGValue): boolean {

@@ -12,6 +12,10 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xlocale": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "xmemory0": "cpp"
     }
 }
