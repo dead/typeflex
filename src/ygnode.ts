@@ -285,7 +285,7 @@ class YGNode {
         if (YGFlexDirectionIsRow(axis) &&
             this.style_.border[YGEdge.Start].unit != YGUnit.Undefined &&
             !YGFloatIsUndefined(this.style_.border[YGEdge.Start].value) &&
-            this.style_.border[YGEdge.Start].value > 0.0) {
+            this.style_.border[YGEdge.Start].value >= 0.0) {
             return this.style_.border[YGEdge.Start].value;
         }
 
@@ -297,7 +297,7 @@ class YGNode {
         if (YGFlexDirectionIsRow(axis) &&
             this.style_.border[YGEdge.End].unit != YGUnit.Undefined &&
             !YGFloatIsUndefined(this.style_.border[YGEdge.End].value) &&
-            this.style_.border[YGEdge.End].value > 0.0) {
+            this.style_.border[YGEdge.End].value >= 0.0) {
             return this.style_.border[YGEdge.End].value;
         }
 
@@ -320,7 +320,7 @@ class YGNode {
     getTrailingPadding(axis: YGFlexDirection, widthSize: number): YGFloatOptional {
         const paddingEdgeEnd: YGFloatOptional = YGResolveValue(this.style_.padding[YGEdge.End], widthSize);
         if (YGFlexDirectionIsRow(axis) &&
-            this.style_.padding[YGEdge.Start].unit != YGUnit.Undefined &&
+            this.style_.padding[YGEdge.End].unit != YGUnit.Undefined &&
             !paddingEdgeEnd.isUndefined() && paddingEdgeEnd.getValue() >= 0.0) {
             return paddingEdgeEnd;
         }

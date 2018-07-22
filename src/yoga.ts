@@ -106,11 +106,14 @@ export function YGComputedEdgeValue(edges: Array<YGValue>, edge: YGEdge, default
         return edges[edge];
     }
 
-    if ((edge == YGEdge.Top || edge == YGEdge.Bottom) && edges[YGEdge.Vertical].unit != YGUnit.Undefined) {
+    if ((edge == YGEdge.Top || edge == YGEdge.Bottom) &&
+        edges[YGEdge.Vertical].unit != YGUnit.Undefined) {
         return edges[YGEdge.Vertical];
     }
 
-    if ((edge == YGEdge.Left || edge == YGEdge.Right || edge == YGEdge.Start || edge == YGEdge.End) && edges[YGEdge.Horizontal].unit != YGUnit.Undefined) {
+    if ((edge == YGEdge.Left || edge == YGEdge.Right || edge == YGEdge.Start ||
+        edge == YGEdge.End) &&
+        edges[YGEdge.Horizontal].unit != YGUnit.Undefined) {
         return edges[YGEdge.Horizontal];
     }
 
@@ -359,7 +362,7 @@ export function YGNodeRemoveChild(owner: YGNode, excludedChild: YGNode): void {
     const firstChild: YGNode = YGNodeGetChild(owner, 0);
     if (firstChild.getOwner() == owner) {
         if (owner.removeChild(excludedChild)) {
-            excludedChild.setLayout((new YGNode()).getLayout());
+            excludedChild.setLayout(null);
             excludedChild.setOwner(null);
             owner.markDirtyAndPropogate();
         }
