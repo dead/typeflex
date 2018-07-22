@@ -1,11 +1,15 @@
 {
   "license": "MIT",
   "dependencies": {
+    "mocha": "^5.2.0",
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
     "typescript": "^2.9.2",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.1.0"
   },
-  "build": "webpack --config webpack.config.js"
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "test": "yarn build && mocha --expose-gc -r tests/tools.js tests/Facebook.Yoga/**/*.js"
+  }
 }

@@ -2,7 +2,8 @@ import {
     YGMeasureMode,
     YGEdge,
     YGUnit,
-    YGLogLevel
+    YGLogLevel,
+    YGDimension
 } from "./enums";
 
 import { YGNode } from "./ygnode";
@@ -51,9 +52,10 @@ export class YGCachedMeasurement {
     }
 }
 
-export const trailing: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Bottom, YGEdge.Top, YGEdge.Right, YGEdge.Left];
 export const leading: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
+export const trailing: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Bottom, YGEdge.Top, YGEdge.Right, YGEdge.Left];
 export const pos: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
+export const dim: [YGDimension, YGDimension, YGDimension, YGDimension] = [YGDimension.Height, YGDimension.Height, YGDimension.Width, YGDimension.Width];
 
 export const YG_MAX_CACHED_RESULT_COUNT: number = 16;
 export const kDefaultFlexGrow: number = 0.0;

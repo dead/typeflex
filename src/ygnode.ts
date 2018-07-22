@@ -73,7 +73,7 @@ class YGNode {
             return this.getLeadingPosition(axis, axisSize);
         }
 
-        let trailingPosition = this.getTrailingPosition(axis, axisSize);
+        let trailingPosition: YGFloatOptional = this.getTrailingPosition(axis, axisSize);
         if (!trailingPosition.isUndefined()) {
             trailingPosition.setValue(-1 * trailingPosition.getValue());
         }
@@ -97,7 +97,7 @@ class YGNode {
                 children: Array<YGNode> = [],
                 config: YGConfig = null,
                 isDirty: boolean = false,
-                resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined, YGValueUndefined]
+                resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined(), YGValueUndefined()]
                 ) {
         if (contextOrNodeOrConfig instanceof YGNode) {
             this.fromNode(contextOrNodeOrConfig);
@@ -233,35 +233,35 @@ class YGNode {
 
     getLeadingPosition(axis: YGFlexDirection, axisSize: number): YGFloatOptional {
         if (YGFlexDirectionIsRow(axis)) {
-            const leadingPosition: YGValue = YGComputedEdgeValue(this.style_.position, YGEdge.Start, YGValueUndefined);
+            const leadingPosition: YGValue = YGComputedEdgeValue(this.style_.position, YGEdge.Start, YGValueUndefined());
             if (leadingPosition.unit != YGUnit.Undefined) {
                 return YGResolveValue(leadingPosition, axisSize);
             }
         }
 
-        const leadingPosition: YGValue = YGComputedEdgeValue(this.style_.position, leading[axis], YGValueUndefined);
+        const leadingPosition: YGValue = YGComputedEdgeValue(this.style_.position, leading[axis], YGValueUndefined());
         return leadingPosition.unit == YGUnit.Undefined ? new YGFloatOptional(0) : YGResolveValue(leadingPosition, axisSize);
     }
 
     isLeadingPositionDefined(axis: YGFlexDirection): boolean {
-        return (YGFlexDirectionIsRow(axis) && (YGComputedEdgeValue(this.style_.position, YGEdge.Start, YGValueUndefined)).unit != YGUnit.Undefined) ||
-               (YGComputedEdgeValue(this.style_.position, leading[axis], YGValueUndefined)).unit != YGUnit.Undefined;
+        return (YGFlexDirectionIsRow(axis) && (YGComputedEdgeValue(this.style_.position, YGEdge.Start, YGValueUndefined())).unit != YGUnit.Undefined) ||
+               (YGComputedEdgeValue(this.style_.position, leading[axis], YGValueUndefined())).unit != YGUnit.Undefined;
     }
 
     isTrailingPosDefined(axis: YGFlexDirection): boolean {
-        return (YGFlexDirectionIsRow(axis) && (YGComputedEdgeValue(this.style_.position, YGEdge.End, YGValueUndefined)).unit != YGUnit.Undefined) ||
-               (YGComputedEdgeValue(this.style_.position, leading[axis], YGValueUndefined)).unit != YGUnit.Undefined;
+        return (YGFlexDirectionIsRow(axis) && (YGComputedEdgeValue(this.style_.position, YGEdge.End, YGValueUndefined())).unit != YGUnit.Undefined) ||
+               (YGComputedEdgeValue(this.style_.position, trailing[axis], YGValueUndefined())).unit != YGUnit.Undefined;
     }
 
     getTrailingPosition(axis: YGFlexDirection, axisSize: number): YGFloatOptional {
         if (YGFlexDirectionIsRow(axis)) {
-            const trailingPosition: YGValue = YGComputedEdgeValue(this.style_.position, YGEdge.End, YGValueUndefined);
+            const trailingPosition: YGValue = YGComputedEdgeValue(this.style_.position, YGEdge.End, YGValueUndefined());
             if (trailingPosition.unit != YGUnit.Undefined) {
                 return YGResolveValue(trailingPosition, axisSize);
             }
         }
 
-        const trailingPosition: YGValue = YGComputedEdgeValue(this.style_.position, trailing[axis], YGValueUndefined);
+        const trailingPosition: YGValue = YGComputedEdgeValue(this.style_.position, trailing[axis], YGValueUndefined());
         return trailingPosition.unit == YGUnit.Undefined ? new YGFloatOptional(0) : YGResolveValue(trailingPosition, axisSize);
     }
 
@@ -270,7 +270,7 @@ class YGNode {
             return YGResolveValueMargin(this.style_.margin[YGEdge.Start], widthSize);
         }
 
-        return YGResolveValueMargin(YGComputedEdgeValue(this.style_.margin, leading[axis], YGValueZero), widthSize);
+        return YGResolveValueMargin(YGComputedEdgeValue(this.style_.margin, leading[axis], YGValueZero()), widthSize);
     }
 
     getTrailingMargin(axis: YGFlexDirection, widthSize: number): YGFloatOptional {
@@ -278,7 +278,7 @@ class YGNode {
             return YGResolveValueMargin(this.style_.margin[YGEdge.End], widthSize);
         }
 
-        return YGResolveValueMargin(YGComputedEdgeValue(this.style_.margin, leading[axis], YGValueZero), widthSize);
+        return YGResolveValueMargin(YGComputedEdgeValue(this.style_.margin, trailing[axis], YGValueZero()), widthSize);
     }
 
     getLeadingBorder(axis: YGFlexDirection): number {
@@ -289,7 +289,7 @@ class YGNode {
             return this.style_.border[YGEdge.Start].value;
         }
 
-        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, leading[axis], YGValueZero).value;
+        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, leading[axis], YGValueZero()).value;
         return YGFloatMax(computedEdgeValue, 0.0);
     }
 
@@ -301,7 +301,7 @@ class YGNode {
             return this.style_.border[YGEdge.End].value;
         }
 
-        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, trailing[axis], YGValueZero).value;
+        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, trailing[axis], YGValueZero()).value;
         return YGFloatMax(computedEdgeValue, 0.0);
     }
 
@@ -313,7 +313,7 @@ class YGNode {
             return paddingEdgeStart;
         }
 
-        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, leading[axis], YGValueZero), widthSize);
+        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, leading[axis], YGValueZero()), widthSize);
         return YGFloatOptionalMax(resolvedValue, new YGFloatOptional(0.0));
     }
 
@@ -325,7 +325,7 @@ class YGNode {
             return paddingEdgeEnd;
         }
 
-        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, trailing[axis], YGValueZero), widthSize);
+        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, trailing[axis], YGValueZero()), widthSize);
         return YGFloatOptionalMax(resolvedValue, new YGFloatOptional(0.0));
     }
 
@@ -472,7 +472,7 @@ class YGNode {
         this.setLayoutPosition(YGUnwrapFloatOptional(this.getLeadingMargin(mainAxis, ownerWidth).add(relativePositionMain)), leading[mainAxis]);
         this.setLayoutPosition(YGUnwrapFloatOptional(this.getTrailingMargin(mainAxis, ownerWidth).add(relativePositionMain)), trailing[mainAxis]);
         this.setLayoutPosition(YGUnwrapFloatOptional(this.getLeadingMargin(crossAxis, ownerWidth).add(relativePositionCross)), leading[crossAxis]);
-        this.setLayoutPosition(YGUnwrapFloatOptional(this.getTrailingMargin(crossAxis, ownerWidth).add(relativePositionCross)), leading[crossAxis]);
+        this.setLayoutPosition(YGUnwrapFloatOptional(this.getTrailingMargin(crossAxis, ownerWidth).add(relativePositionCross)), trailing[crossAxis]);
     }
 
     setAndPropogateUseLegacyFlag(useLegacyFlag: boolean): void {
@@ -522,14 +522,14 @@ class YGNode {
         }
 
         if (!this.style_.flex.isUndefined() && this.style_.flex.getValue() > 0.0) {
-            return this.config_.useWebDefaults ? YGValueAuto : YGValueZero;
+            return this.config_.useWebDefaults ? YGValueAuto() : YGValueZero();
         }
 
-        return YGValueAuto;
+        return YGValueAuto();
     }
 
     resolveDimension(): void {
-        for (let dim = YGDimension.Width; dim < YGDimensionCount; dim++) {
+        for (let dim = YGDimension.Width; dim < YGDimensionCount; ++dim) {
             if (this.style_.maxDimensions[dim].unit != YGUnit.Undefined && YGValueEqual(this.style_.maxDimensions[dim], this.style_.minDimensions[dim])) {
                 this.resolvedDimensions_[dim] = this.style_.maxDimensions[dim];
             } else {
