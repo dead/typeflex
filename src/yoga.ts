@@ -1833,7 +1833,7 @@ export function YGNodeComputeFlexBasisForChildren(
     mainAxis: YGFlexDirection,
     config: YGConfig,
     performLayout: boolean,
-    totalOuterFlexBasis: number) {
+    totalOuterFlexBasisRef: {value: number}) {
 
     let singleFlexChild: YGNode = null;
     const children: Array<YGNode> = node.getChildren();
@@ -1895,7 +1895,7 @@ export function YGNodeComputeFlexBasisForChildren(
                 config);
         }
 
-        totalOuterFlexBasis += YGUnwrapFloatOptional(
+        totalOuterFlexBasisRef.value += YGUnwrapFloatOptional(
             child.getLayout().computedFlexBasis.add(
                 child.getMarginForAxis(mainAxis, availableInnerWidth)));
     }
@@ -2555,8 +2555,7 @@ export function YGNodelayoutImpl(node: YGNode,
         YGUnwrapFloatOptional(YGResolveValue(node.getStyle().minDimensions[YGDimension.Height], ownerHeight)) -
         paddingAndBorderAxisColumn;
     const maxInnerHeight: number =
-        YGUnwrapFloatOptional(YGResolveValue(
-            node.getStyle().maxDimensions[YGDimension.Height], ownerHeight)) -
+        YGUnwrapFloatOptional(YGResolveValue(node.getStyle().maxDimensions[YGDimension.Height], ownerHeight)) -
         paddingAndBorderAxisColumn;
 
     const minInnerMainDim: number = isMainAxisRow ? minInnerWidth : minInnerHeight;
@@ -2571,7 +2570,7 @@ export function YGNodelayoutImpl(node: YGNode,
     let availableInnerCrossDim: number =
         isMainAxisRow ? availableInnerHeight : availableInnerWidth;
 
-    const totalOuterFlexBasis: number = 0;
+    const totalOuterFlexBasis: {value: number} = {value: 0};
 
     YGNodeComputeFlexBasisForChildren(
         node,
@@ -2587,7 +2586,7 @@ export function YGNodelayoutImpl(node: YGNode,
 
     const flexBasisOverflows: boolean = measureModeMainDim == YGMeasureMode.Undefined
         ? false
-        : totalOuterFlexBasis > availableInnerMainDim;
+        : totalOuterFlexBasis.value > availableInnerMainDim;
     if (isNodeFlexWrap && flexBasisOverflows &&
         measureModeMainDim == YGMeasureMode.AtMost) {
         measureModeMainDim = YGMeasureMode.Exactly;
