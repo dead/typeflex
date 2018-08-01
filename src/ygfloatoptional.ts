@@ -22,6 +22,10 @@ class YGFloatOptional {
         }
     }
 
+    clone(): YGFloatOptional {
+        return new YGFloatOptional(this.isUndefined_ ? undefined : this.value_)
+    }
+
     getValue(): number {
         if (this.isUndefined_) {
             throw "Tried to get value of an undefined YGFloatOptional";

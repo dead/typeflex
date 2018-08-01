@@ -94,11 +94,11 @@ function YGDefaultLog(config: YGConfig, node: YGNode, level: YGLogLevel, format:
 }
 
 export function YGFloatIsUndefined(value: number) {
-    if (value === undefined) {
+    if (value === undefined || isNaN(value)) {
         return true;
     }
-
     return false;
+    // return value >= 10E8 || value <= -10E8;
 }
 
 export function YGComputedEdgeValue(edges: Array<YGValue>, edge: YGEdge, defaultValue: YGValue): YGValue {
@@ -221,6 +221,7 @@ export function YGNodeNew(): YGNode {
 }
 
 export function YGNodeClone(oldNode: YGNode) {
+    console.log('clone?')
     const node: YGNode = new YGNode(oldNode);
     gNodeInstanceCount++;
     node.setOwner(null);
@@ -362,7 +363,7 @@ export function YGNodeRemoveChild(owner: YGNode, excludedChild: YGNode): void {
     const firstChild: YGNode = YGNodeGetChild(owner, 0);
     if (firstChild.getOwner() == owner) {
         if (owner.removeChild(excludedChild)) {
-            excludedChild.setLayout(null);
+            excludedChild.setLayout(new YGLayout());
             excludedChild.setOwner(null);
             owner.markDirtyAndPropogate();
         }
@@ -1558,7 +1559,9 @@ export function YGNodeAbsoluteLayoutChild(node: YGNode, child: YGNode, width: nu
                         child.getTrailingPosition(YGFlexDirection.Column, height)));
             childHeight = YGNodeBoundAxis(child, YGFlexDirection.Column, childHeight, height, width);
         }
-    } if (YGFloatIsUndefined(childWidth) ? !YGFloatIsUndefined(childHeight) : YGFloatIsUndefined(childHeight)) { // if( foo ? !bar : bar ) { XOR ^ REMOVED
+    }
+    
+    if (YGFloatIsUndefined(childWidth) ? !YGFloatIsUndefined(childHeight) : YGFloatIsUndefined(childHeight)) { // if( foo ? !bar : bar ) { XOR ^ REMOVED
         if (!child.getStyle().aspectRatio.isUndefined()) {
             if (YGFloatIsUndefined(childWidth)) {
                 childWidth = marginRow + (childHeight - marginColumn) * child.getStyle().aspectRatio.getValue();
@@ -1566,7 +1569,9 @@ export function YGNodeAbsoluteLayoutChild(node: YGNode, child: YGNode, width: nu
                 childHeight = marginColumn + (childWidth - marginRow) / child.getStyle().aspectRatio.getValue();
             }
         }
-    } if (YGFloatIsUndefined(childWidth) || YGFloatIsUndefined(childHeight)) {
+    }
+    
+    if (YGFloatIsUndefined(childWidth) || YGFloatIsUndefined(childHeight)) {
         childWidthMeasureMode = YGFloatIsUndefined(childWidth) ? YGMeasureMode.Undefined : YGMeasureMode.Exactly;
         childHeightMeasureMode = YGFloatIsUndefined(childHeight) ? YGMeasureMode.Undefined : YGMeasureMode.Exactly;
 
@@ -1645,7 +1650,7 @@ export function YGNodeAbsoluteLayoutChild(node: YGNode, child: YGNode, width: nu
             2.0,
             leading[crossAxis]);
     } else if (!child.isLeadingPositionDefined(crossAxis) &&
-        ((YGNodeAlignItem(node, child) == YGAlign.FlexEnd) ? !(node.getStyle().flexWrap == YGWrap.WrapReverse) : (node.getStyle().flexWrap == YGWrap.WrapReverse))) { // XOR
+        (YGNodeAlignItem(node, child) == YGAlign.FlexEnd ? !(node.getStyle().flexWrap == YGWrap.WrapReverse) : (node.getStyle().flexWrap == YGWrap.WrapReverse))) { // XOR
         child.setLayoutPosition(
             (node.getLayout().measuredDimensions[dim[crossAxis]] -
                 child.getLayout().measuredDimensions[dim[crossAxis]]),
@@ -1715,7 +1720,7 @@ export function YGNodeWithMeasureFuncSetMeasuredDimensions(node: YGNode, availab
     }
 }
 
-export function YGNodeEmptyContainerSetMeasuredDimensions(node: YGNode, availableHeight: number, availableWidth: number, widthMeasureMode: YGMeasureMode, heightMeasureMode: YGMeasureMode, ownerWidth: number, ownerHeight: number): void {
+export function YGNodeEmptyContainerSetMeasuredDimensions(node: YGNode, availableWidth: number, availableHeight: number, widthMeasureMode: YGMeasureMode, heightMeasureMode: YGMeasureMode, ownerWidth: number, ownerHeight: number): void {
     const paddingAndBorderAxisRow: number = YGNodePaddingAndBorderForAxis(node, YGFlexDirection.Row, ownerWidth);
     const paddingAndBorderAxisColumn: number = YGNodePaddingAndBorderForAxis(node, YGFlexDirection.Column, ownerWidth);
     const marginAxisRow: number = YGUnwrapFloatOptional(node.getMarginForAxis(YGFlexDirection.Row, ownerWidth));
@@ -1833,17 +1838,19 @@ export function YGNodeComputeFlexBasisForChildren(
     let singleFlexChild: YGNode = null;
     const children: Array<YGNode> = node.getChildren();
     const measureModeMainDim: YGMeasureMode = YGFlexDirectionIsRow(mainAxis) ? widthMeasureMode : heightMeasureMode;
+
     if (measureModeMainDim == YGMeasureMode.Exactly) {
         for (let i = 0; i < children.length; ++i) {
             const child: YGNode = children[i];
-            if (singleFlexChild != null) {
-                if (child.isNodeFlexible()) {
-
+            if (child.isNodeFlexible()) {
+                if (singleFlexChild != null ||
+                    YGFloatsEqual(child.resolveFlexGrow(), 0.0) ||
+                    YGFloatsEqual(child.resolveFlexShrink(), 0.0)) {
                     singleFlexChild = null;
                     break;
+                } else {
+                    singleFlexChild = child;
                 }
-            } else if (child.resolveFlexGrow() > 0.0 && child.resolveFlexShrink() > 0.0) {
-                singleFlexChild = child;
             }
         }
     }
@@ -1858,7 +1865,6 @@ export function YGNodeComputeFlexBasisForChildren(
             continue;
         }
         if (performLayout) {
-
             const childDirection: YGDirection = child.resolveDirection(direction);
             const mainDim: number = YGFlexDirectionIsRow(mainAxis)
                 ? availableInnerWidth
@@ -1944,10 +1950,14 @@ export function YGCalculateCollectFlexItemsRowValues(
         }
 
         flexAlgoRowMeasurement.relativeChildren.push(child);
-    } if (flexAlgoRowMeasurement.totalFlexGrowFactors > 0 &&
+    }
+
+    if (flexAlgoRowMeasurement.totalFlexGrowFactors > 0 &&
         flexAlgoRowMeasurement.totalFlexGrowFactors < 1) {
         flexAlgoRowMeasurement.totalFlexGrowFactors = 1;
-    } if (flexAlgoRowMeasurement.totalFlexShrinkScaledFactors > 0 &&
+    }
+
+    if (flexAlgoRowMeasurement.totalFlexShrinkScaledFactors > 0 &&
         flexAlgoRowMeasurement.totalFlexShrinkScaledFactors < 1) {
         flexAlgoRowMeasurement.totalFlexShrinkScaledFactors = 1;
     }
@@ -3085,7 +3095,9 @@ export function YGNodelayoutImpl(node: YGNode,
                         crossAxisownerSize))),
                 paddingAndBorderAxisCross),
             dim[crossAxis]);
-    } if (performLayout && node.getStyle().flexWrap == YGWrap.WrapReverse) {
+    } 
+    
+    if (performLayout && node.getStyle().flexWrap == YGWrap.WrapReverse) {
         for (let i: number = 0; i < childCount; i++) {
             const child: YGNode = YGNodeGetChild(node, i);
             if (child.getStyle().positionType == YGPositionType.Relative) {

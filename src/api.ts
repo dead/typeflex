@@ -501,8 +501,16 @@ export class Node {
         YGNodeStyleSetFlex(this.node, flex);
     }
 
-    setFlexBasis(flexBasis: number): void {
-        YGNodeStyleSetFlexBasis(this.node, flexBasis);
+    setFlexBasis(flexBasis: number | string): void {
+        if (typeof flexBasis === 'string') {
+            if (flexBasis[flexBasis.length - 1] === '%') {
+                this.setFlexBasisPercent(parseFloat(flexBasis));
+            } else {
+                throw new Error('Invalid input type');
+            }
+        } else {
+            YGNodeStyleSetFlexBasis(this.node, flexBasis as number);
+        }
     }
 
     setFlexBasisPercent(flexBasis: number): void {
@@ -525,8 +533,19 @@ export class Node {
         YGNodeStyleSetFlexWrap(this.node, flexWrap);
     }
 
-    setHeight(height: number): void {
-        YGNodeStyleSetHeight(this.node, height);
+    setHeight(height: number | string): void {
+        if (typeof height === 'string') {
+            if (height === 'auto') {
+                this.setHeightAuto();
+            }
+            else if (height[height.length - 1] === '%') {
+                this.setHeightPercent(parseFloat(height));
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetHeight(this.node, height as number);
+        }
     }
 
     setHeightAuto(): void {
@@ -541,8 +560,19 @@ export class Node {
         YGNodeStyleSetJustifyContent(this.node, justifyContent);
     }
 
-    setMargin(edge: YGEdge, margin: number): void {
-        YGNodeStyleSetMargin(this.node, edge, margin);
+    setMargin(edge: YGEdge, margin: number|string): void {
+        if (typeof margin === 'string') {
+            if (margin === 'auto') {
+                this.setMarginAuto(edge);
+            }
+            else if (margin[margin.length - 1] === '%') {
+                this.setMarginPercent(edge, parseFloat(margin));
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetMargin(this.node, edge, margin);
+        }
     }
 
     setMarginAuto(edge: YGEdge): void {
@@ -553,16 +583,32 @@ export class Node {
         YGNodeStyleSetMarginPercent(this.node, edge, margin);
     }
 
-    setMaxHeight(maxHeight: number): void {
-        YGNodeStyleSetMaxHeight(this.node, maxHeight);
+    setMaxHeight(maxHeight: number | string): void {
+        if (typeof maxHeight === 'string') {
+            if (maxHeight[maxHeight.length - 1] === '%') {
+                this.setMaxHeightPercent(parseFloat(maxHeight))
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetMaxHeight(this.node, maxHeight as number);
+        }
     }
 
     setMaxHeightPercent(maxHeight: number): void {
         YGNodeStyleSetMaxHeightPercent(this.node, maxHeight);
     }
 
-    setMaxWidth(maxWidth: number): void {
-        YGNodeStyleSetMaxWidth(this.node, maxWidth);
+    setMaxWidth(maxWidth: number | string): void {
+        if (typeof maxWidth === 'string') {
+            if (maxWidth[maxWidth.length - 1] === '%') {
+                this.setMaxWidthPercent(parseFloat(maxWidth))
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetMaxWidth(this.node, maxWidth as number);
+        }
     }
 
     setMaxWidthPercent(maxWidth: number): void {
@@ -573,16 +619,32 @@ export class Node {
         YGNodeSetMeasureFunc(this.node, measureFunc);
     }
 
-    setMinHeight(minHeight: number): void {
-        YGNodeStyleSetMinHeight(this.node, minHeight);
+    setMinHeight(minHeight: number | string): void {
+        if (typeof minHeight === 'string') {
+            if (minHeight[minHeight.length - 1] === '%') {
+                this.setMinHeightPercent(parseFloat(minHeight))
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetMinHeight(this.node, minHeight as number);
+        }
     }
 
     setMinHeightPercent(minHeight: number): void {
         YGNodeStyleSetMinHeightPercent(this.node, minHeight);
     }
 
-    setMinWidth(minWidth: number): void {
-        YGNodeStyleSetMinWidth(this.node, minWidth);
+    setMinWidth(minWidth: number | string): void {
+        if (typeof minWidth === 'string') {
+            if (minWidth[minWidth.length - 1] === '%') {
+                this.setMinWidthPercent(parseFloat(minWidth))
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetMinWidth(this.node, minWidth as number);
+        }
     }
 
     setMinWidthPercent(minWidth: number): void {
@@ -593,16 +655,32 @@ export class Node {
         YGNodeStyleSetOverflow(this.node, overflow);
     }
 
-    setPadding(edge: YGEdge, padding: number): void {
-        YGNodeStyleSetPadding(this.node, edge, padding);
+    setPadding(edge: YGEdge, padding: number | string): void {
+        if (typeof padding === 'string') {
+            if (padding[padding.length - 1] === '%') {
+                this.setPaddingPercent(edge, parseFloat(padding))
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetPadding(this.node, edge, padding as number);
+        }
     }
 
     setPaddingPercent(edge: YGEdge, padding: number): void {
         YGNodeStyleSetPaddingPercent(this.node, edge, padding);
     }
 
-    setPosition(edge: YGEdge, position: number): void {
-        YGNodeStyleSetPosition(this.node, edge, position);
+    setPosition(edge: YGEdge, position: number | string): void {
+        if (typeof position === 'string') {
+            if (position[position.length - 1] === '%') {
+                this.setPositionPercent(edge, parseFloat(position))
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetPosition(this.node, edge, position as number);
+        }
     }
 
     setPositionPercent(edge: YGEdge, position: number): void {
@@ -613,8 +691,18 @@ export class Node {
         YGNodeStyleSetPositionType(this.node, positionType);
     }
 
-    setWidth(width: number): void {
-        YGNodeStyleSetWidth(this.node, width);
+    setWidth(width: number | string): void {
+        if (typeof width === 'string') {
+            if (width[width.length - 1] === '%') {
+                this.setWidthPercent(parseFloat(width));
+            } else if (width === 'auto') {
+                this.setWidthAuto();
+            } else {
+                throw new Error('Invalid input type.');
+            }
+        } else {
+            YGNodeStyleSetWidth(this.node, width as number);
+        }
     }
 
     setWidthAuto(): void {

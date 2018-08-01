@@ -109,6 +109,28 @@ class YGLayout {
         this.padding = [undefined, undefined, undefined, undefined, undefined, undefined];
         this.cachedMeasurements = buildCache(YG_MAX_CACHED_RESULT_COUNT);
     }
+
+    clone(): YGLayout {
+        let newLayout = new YGLayout();
+        newLayout.dimensions = [this.dimensions[0], this.dimensions[1]]
+        newLayout.direction = this.direction;
+        newLayout.computedFlexBasisGeneration = this.computedFlexBasisGeneration;
+        newLayout.computedFlexBasis = this.computedFlexBasis.clone();
+        newLayout.hadOverflow = this.hadOverflow;
+        newLayout.generationCount = this.generationCount;
+        newLayout.lastOwnerDirection = this.lastOwnerDirection;
+        newLayout.nextCachedMeasurementsIndex = this.nextCachedMeasurementsIndex;
+        newLayout.measuredDimensions = [this.measuredDimensions[0], this.measuredDimensions[1]];
+        newLayout.cachedLayout = this.cachedLayout.clone();
+        newLayout.didUseLegacyFlag = this.didUseLegacyFlag;
+        newLayout.doesLegacyStretchFlagAffectsLayout = this.doesLegacyStretchFlagAffectsLayout;
+        newLayout.position = [this.position[0], this.position[1], this.position[2], this.position[3]]
+        newLayout.margin = [this.margin[0], this.margin[1], this.margin[2], this.margin[3], this.margin[4], this.margin[5]]
+        newLayout.border = [this.border[0], this.border[1], this.border[2], this.border[3], this.border[4], this.border[5]]
+        newLayout.padding = [this.padding[0], this.padding[1], this.padding[2], this.padding[3], this.padding[4], this.padding[5]]
+        newLayout.cachedMeasurements = buildCache(YG_MAX_CACHED_RESULT_COUNT);
+        return newLayout;
+    }
 }
 
 export {

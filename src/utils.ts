@@ -130,3 +130,11 @@ export function YGResolveFlexDirection(flexDirection: YGFlexDirection, direction
 export function YGResolveValueMargin(value: YGValue, ownerSize: number): YGFloatOptional {
     return value.unit == YGUnit.Auto ? new YGFloatOptional(0) : YGResolveValue(value, ownerSize);
 }
+
+export function cloneYGValueArray(array: Array<YGValue>): Array<YGValue> {
+    let ret = new Array(array.length);
+    for (let i = 0; i < array.length; i++) {
+        ret[i] = array[i].clone();
+    }
+    return ret;
+}

@@ -50,6 +50,17 @@ export class YGCachedMeasurement {
 
         return isEqual;
     }
+
+    clone(): YGCachedMeasurement {
+        let newCached = new YGCachedMeasurement();
+        newCached.availableWidth = this.availableWidth;
+        newCached.availableHeight = this.availableHeight;
+        newCached.widthMeasureMode = this.widthMeasureMode;
+        newCached.heightMeasureMode = this.heightMeasureMode;
+        newCached.computedWidth = this.computedWidth;
+        newCached.computedHeight = this.computedHeight;
+        return newCached;
+    }
 }
 
 export const leading: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];

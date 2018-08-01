@@ -10,4 +10,8 @@ export class YGValue {
         this.value = value;
         this.unit = unit;
     }
+
+    clone(): YGValue {
+        return new YGValue(this.value, this.unit)
+    }
 }

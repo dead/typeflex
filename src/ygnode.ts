@@ -99,7 +99,9 @@ class YGNode {
                 isDirty: boolean = false,
                 resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined(), YGValueUndefined()]
                 ) {
+        
         if (contextOrNodeOrConfig instanceof YGNode) {
+            console.log('from node')
             this.fromNode(contextOrNodeOrConfig);
             return;
         }
@@ -138,6 +140,8 @@ class YGNode {
     }
 
     fromNode(node: YGNode): void {
+        console.log(node);
+        
         this.context_ = node.context_;
         this.print_ = node.print_;
         this.hasNewLayout_ = node.hasNewLayout_;
@@ -145,14 +149,28 @@ class YGNode {
         this.measure_ = node.measure_;
         this.baseline_ = node.baseline_;
         this.dirtied_ = node.dirtied_;
-        this.style_ = node.style_;
-        this.layout_ = node.layout_;
+
+        this.style_ = node.style_; //
+        // this.style_ = node.style_.clone();
+
+        this.layout_ = node.layout_; //
+        // this.layout_ = node.layout_.clone();
+
         this.lineIndex_ = node.lineIndex_;
         this.owner_ = node.owner_;
-        this.children_ = node.children_;
+
+        this.children_ = node.children_; //
+        // let newChildren: Array<YGNode> = new Array(node.children_.length);
+        // for(let i = 0; i < node.children_.length; ++i) {
+        //     newChildren[i] = node.children_[i]
+        // }
+        // this.children_ = newChildren;
+
         this.config_ = node.config_;
         this.isDirty_ = node.isDirty_;
-        this.resolvedDimensions_ = node.resolvedDimensions_;
+
+        this.resolvedDimensions_ = node.resolvedDimensions_; // 
+        // this.resolvedDimensions_ = [node.resolvedDimensions_[0].clone(), node.resolvedDimensions_[1].clone()];
     }
 
     getContext(): any {
@@ -394,7 +412,7 @@ class YGNode {
         this.style_.alignContent = alignContent;
     }
 
-    setLayout(layout: YGLayout) : void{
+    setLayout(layout: YGLayout) : void {
         this.layout_ = layout;
     }
 
@@ -679,7 +697,7 @@ class YGNode {
             return false;
         }
 
-        if (this.layout_ != node.getLayout()) {
+        if (this.layout_.diff(node.getLayout())) {
             return false;
         }
 

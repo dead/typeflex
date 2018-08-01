@@ -13,7 +13,8 @@ import {
 
 import {
     YGValueEqual,
-    YGValueArrayEqual
+    YGValueArrayEqual,
+    cloneYGValueArray
 } from "./utils";
 
 import { YGValue } from "./ygvalue";
@@ -128,6 +129,33 @@ class YGStyle {
 
     isDiff(style: YGStyle): boolean {
         return !this.isEqual(style);
+    }
+
+    clone(): YGStyle {
+        let newStyle: YGStyle = new YGStyle();
+        newStyle.direction = this.direction;
+        newStyle.flexDirection = this.flexDirection;
+        newStyle.justifyContent = this.justifyContent;
+        newStyle.alignContent = this.alignContent;
+        newStyle.alignItems = this.alignItems;
+        newStyle.alignSelf = this.alignSelf;
+        newStyle.positionType = this.positionType;
+        newStyle.flexWrap = this.flexWrap;
+        newStyle.overflow = this.overflow;
+        newStyle.display = this.display;
+        newStyle.flex = this.flex.clone(); 
+        newStyle.flexGrow = this.flexGrow.clone(); 
+        newStyle.flexShrink = this.flexShrink.clone(); 
+        newStyle.flexBasis = this.flexBasis.clone();
+        newStyle.margin = cloneYGValueArray(this.margin);
+        newStyle.position = cloneYGValueArray(this.position);
+        newStyle.padding = cloneYGValueArray(this.padding);
+        newStyle.border = cloneYGValueArray(this.border);
+        newStyle.dimensions = [this.dimensions[0].clone(), this.dimensions[1].clone()];
+        newStyle.minDimensions = [this.minDimensions[0].clone(), this.minDimensions[1].clone()];
+        newStyle.maxDimensions = [this.maxDimensions[0].clone(), this.maxDimensions[1].clone()];
+        newStyle.aspectRatio = this.aspectRatio.clone();
+        return newStyle;
     }
 }
 
