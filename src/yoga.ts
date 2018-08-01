@@ -1440,7 +1440,8 @@ export function YGNodeComputeFlexBasisForChild(node: YGNode, child: YGNode, widt
         if (isColumnStyleDimDefined) {
             childHeight = YGUnwrapFloatOptional(YGResolveValue(child.getResolvedDimension(YGDimension.Height), ownerHeight)) + marginColumn;
             childHeightMeasureMode = YGMeasureMode.Exactly;
-        } if ((!isMainAxisRow && node.getStyle().overflow == YGOverflow.Scroll) ||
+        }
+        if ((!isMainAxisRow && node.getStyle().overflow == YGOverflow.Scroll) ||
             node.getStyle().overflow != YGOverflow.Scroll) {
             if (YGFloatIsUndefined(childWidth) && !YGFloatIsUndefined(width)) {
                 childWidth = width;
@@ -1467,8 +1468,7 @@ export function YGNodeComputeFlexBasisForChild(node: YGNode, child: YGNode, widt
         }
 
         const hasExactWidth: boolean = !YGFloatIsUndefined(width) && widthMode == YGMeasureMode.Exactly;
-        const childWidthStretch: boolean = YGNodeAlignItem(node, child) == YGAlign.Stretch
-        childWidthMeasureMode != YGMeasureMode.Exactly;
+        const childWidthStretch: boolean = YGNodeAlignItem(node, child) == YGAlign.Stretch && childWidthMeasureMode != YGMeasureMode.Exactly;
         if (!isMainAxisRow && !isRowStyleDimDefined && hasExactWidth && childWidthStretch) {
             childWidth = width;
             childWidthMeasureMode = YGMeasureMode.Exactly;
@@ -1505,7 +1505,7 @@ export function YGNodeComputeFlexBasisForChild(node: YGNode, child: YGNode, widt
             childHeightRef.value,
             direction,
             childWidthMeasureModeRef.value,
-            childWidthMeasureModeRef.value,
+            childHeightMeasureModeRef.value,
             ownerWidth,
             ownerHeight,
             false,
@@ -1944,9 +1944,8 @@ export function YGCalculateCollectFlexItemsRowValues(
         flexAlgoRowMeasurement.itemsOnLine++;
 
         if (child.isNodeFlexible()) {
-            flexAlgoRowMeasurement.totalFlexGrowFactors += child.resolveFlexGrow(); flexAlgoRowMeasurement.totalFlexShrinkScaledFactors +=
-                -child.resolveFlexShrink() *
-                YGUnwrapFloatOptional(child.getLayout().computedFlexBasis);
+            flexAlgoRowMeasurement.totalFlexGrowFactors += child.resolveFlexGrow();
+            flexAlgoRowMeasurement.totalFlexShrinkScaledFactors += (-child.resolveFlexShrink()) * YGUnwrapFloatOptional(child.getLayout().computedFlexBasis);
         }
 
         flexAlgoRowMeasurement.relativeChildren.push(child);
@@ -1999,8 +1998,7 @@ export function YGDistributeFreeSpaceSecondPass(
 
         if (!YGFloatIsUndefined(collectedFlexItemsValues.remainingFreeSpace) &&
             collectedFlexItemsValues.remainingFreeSpace < 0) {
-            flexShrinkScaledFactor =
-                -currentRelativeChild.resolveFlexShrink() * childFlexBasis;
+            flexShrinkScaledFactor = -currentRelativeChild.resolveFlexShrink() * childFlexBasis;
 
             if (flexShrinkScaledFactor != 0) {
                 let childSize: number;
@@ -2032,8 +2030,8 @@ export function YGDistributeFreeSpaceSecondPass(
                     currentRelativeChild,
                     mainAxis,
                     childFlexBasis +
-                    collectedFlexItemsValues.remainingFreeSpace /
-                    collectedFlexItemsValues.totalFlexGrowFactors *
+                    (collectedFlexItemsValues.remainingFreeSpace /
+                    collectedFlexItemsValues.totalFlexGrowFactors) *
                     flexGrowFactor,
                     availableInnerMainDim,
                     availableInnerWidth);
@@ -2178,7 +2176,7 @@ export function YGDistributeFreeSpaceFirstPass(
 
         if (collectedFlexItemsValues.remainingFreeSpace < 0) {
             flexShrinkScaledFactor =
-                -currentRelativeChild.resolveFlexShrink() * childFlexBasis;
+                (-currentRelativeChild.resolveFlexShrink()) * childFlexBasis;
             if (!YGFloatIsUndefined(flexShrinkScaledFactor) &&
                 flexShrinkScaledFactor != 0) {
                 baseMainSize = childFlexBasis +
