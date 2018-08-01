@@ -1560,7 +1560,7 @@ export function YGNodeAbsoluteLayoutChild(node: YGNode, child: YGNode, width: nu
             childHeight = YGNodeBoundAxis(child, YGFlexDirection.Column, childHeight, height, width);
         }
     }
-    
+
     if (YGFloatIsUndefined(childWidth) ? !YGFloatIsUndefined(childHeight) : YGFloatIsUndefined(childHeight)) { // if( foo ? !bar : bar ) { XOR ^ REMOVED
         if (!child.getStyle().aspectRatio.isUndefined()) {
             if (YGFloatIsUndefined(childWidth)) {
@@ -1570,7 +1570,7 @@ export function YGNodeAbsoluteLayoutChild(node: YGNode, child: YGNode, width: nu
             }
         }
     }
-    
+
     if (YGFloatIsUndefined(childWidth) || YGFloatIsUndefined(childHeight)) {
         childWidthMeasureMode = YGFloatIsUndefined(childWidth) ? YGMeasureMode.Undefined : YGMeasureMode.Exactly;
         childHeightMeasureMode = YGFloatIsUndefined(childHeight) ? YGMeasureMode.Undefined : YGMeasureMode.Exactly;
@@ -1833,7 +1833,7 @@ export function YGNodeComputeFlexBasisForChildren(
     mainAxis: YGFlexDirection,
     config: YGConfig,
     performLayout: boolean,
-    totalOuterFlexBasisRef: {value: number}) {
+    totalOuterFlexBasisRef: { value: number }) {
 
     let singleFlexChild: YGNode = null;
     const children: Array<YGNode> = node.getChildren();
@@ -2031,7 +2031,7 @@ export function YGDistributeFreeSpaceSecondPass(
                     mainAxis,
                     childFlexBasis +
                     (collectedFlexItemsValues.remainingFreeSpace /
-                    collectedFlexItemsValues.totalFlexGrowFactors) *
+                        collectedFlexItemsValues.totalFlexGrowFactors) *
                     flexGrowFactor,
                     availableInnerMainDim,
                     availableInnerWidth);
@@ -2085,8 +2085,8 @@ export function YGDistributeFreeSpaceSecondPass(
                 marginCross;
             const isLoosePercentageMeasurement: boolean =
                 currentRelativeChild.getResolvedDimension(dim[crossAxis]).unit ==
-                YGUnit.Percent
-            measureModeCrossDim != YGMeasureMode.Exactly;
+                YGUnit.Percent &&
+                measureModeCrossDim != YGMeasureMode.Exactly;
             childCrossMeasureMode =
                 YGFloatIsUndefined(childCrossSize) || isLoosePercentageMeasurement
                     ? YGMeasureMode.Undefined
@@ -2105,6 +2105,7 @@ export function YGDistributeFreeSpaceSecondPass(
             availableInnerWidth,
             childMainMeasureModeRef,
             childMainSizeRef);
+        
         YGConstrainMaxSizeForMode(
             currentRelativeChild,
             crossAxis,
@@ -2568,7 +2569,7 @@ export function YGNodelayoutImpl(node: YGNode,
     let availableInnerCrossDim: number =
         isMainAxisRow ? availableInnerHeight : availableInnerWidth;
 
-    const totalOuterFlexBasis: {value: number} = {value: 0};
+    const totalOuterFlexBasis: { value: number } = { value: 0 };
 
     YGNodeComputeFlexBasisForChildren(
         node,
@@ -3092,8 +3093,8 @@ export function YGNodelayoutImpl(node: YGNode,
                         crossAxisownerSize))),
                 paddingAndBorderAxisCross),
             dim[crossAxis]);
-    } 
-    
+    }
+
     if (performLayout && node.getStyle().flexWrap == YGWrap.WrapReverse) {
         for (let i: number = 0; i < childCount; i++) {
             const child: YGNode = YGNodeGetChild(node, i);
