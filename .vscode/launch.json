@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Run project",
-            "args": ["./src/main.ts"],
+            "args": ["./src/api.ts"],
             "runtimeArgs": [
                 "--nolazy", "-r", "ts-node/register"
             ],

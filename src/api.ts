@@ -107,12 +107,14 @@ import {
     YGConfigNew,
     YGNodeNewWithConfig,
     YGNodeNew,
-    YGNodeStyleSetPosition
+    YGNodeStyleSetPosition,
+    YGNodeGetInstanceCount,
 } from "./yoga"
 
 import { YGNode } from "./ygnode"
 import { YGValue } from "./ygvalue"
 import { YGConfig } from "./ygconfig"
+import { YGFloatSanitize } from "./utils"
 
 export const ALIGN_AUTO = YGAlign.Auto;
 export const ALIGN_FLEX_START = YGAlign.FlexStart;
@@ -187,7 +189,6 @@ export class Size {
     public width: number;
     public height: number;
 
-    constructor();
     constructor(width?: number, height?: number) {
         if (width) {
             this.width = width;
@@ -196,6 +197,10 @@ export class Size {
             this.width = 0;
             this.height = 0;
         }
+    }
+
+    static fromJS(obj: {width: number, height: number}) {
+        return new Size(obj.width, obj.height);
     }
 }
 
@@ -333,7 +338,7 @@ export class Node {
     }
 
     getComputedHeight(): number {
-        return YGNodeLayoutGetHeight(this.node);
+        return YGFloatSanitize(YGNodeLayoutGetHeight(this.node));
     }
 
     getComputedLayout(): Layout {
@@ -348,27 +353,27 @@ export class Node {
     }
 
     getComputedLeft(): number {
-        return YGNodeLayoutGetLeft(this.node);
+        return YGFloatSanitize(YGNodeLayoutGetLeft(this.node));
     }
 
     getComputedMargin(edge: YGEdge): number {
-        return YGNodeLayoutGetMargin(this.node, edge);
+        return YGFloatSanitize(YGNodeLayoutGetMargin(this.node, edge));
     }
 
     getComputedPadding(edge: YGEdge): number {
-        return YGNodeLayoutGetPadding(this.node, edge);
+        return YGFloatSanitize(YGNodeLayoutGetPadding(this.node, edge));
     }
 
     getComputedRight(): number {
-        return YGNodeLayoutGetRight(this.node);
+        return YGFloatSanitize(YGNodeLayoutGetRight(this.node));
     }
 
     getComputedTop(): number {
-        return YGNodeLayoutGetTop(this.node);
+        return YGFloatSanitize(YGNodeLayoutGetTop(this.node));
     }
 
     getComputedWidth(): number {
-        return YGNodeLayoutGetWidth(this.node);
+        return YGFloatSanitize(YGNodeLayoutGetWidth(this.node));
     }
 
     getDisplay(): YGDisplay {
@@ -560,7 +565,7 @@ export class Node {
         YGNodeStyleSetJustifyContent(this.node, justifyContent);
     }
 
-    setMargin(edge: YGEdge, margin: number|string): void {
+    setMargin(edge: YGEdge, margin: number | string): void {
         if (typeof margin === 'string') {
             if (margin === 'auto') {
                 this.setMarginAuto(edge);
@@ -616,7 +621,15 @@ export class Node {
     }
 
     setMeasureFunc(measureFunc: any): void {
-        YGNodeSetMeasureFunc(this.node, measureFunc);
+        if (measureFunc == null) {
+            this.unsetMeasureFunc();
+        } else {
+            YGNodeSetMeasureFunc(this.node, measureFunc);
+        }
+    }
+
+    unsetMeasureFunc() {
+        YGNodeSetMeasureFunc(this.node, null);
     }
 
     setMinHeight(minHeight: number | string): void {
@@ -718,3 +731,7 @@ export class Node {
     }
 }
 
+
+export function getInstanceCount(): number {
+    return YGNodeGetInstanceCount()
+}

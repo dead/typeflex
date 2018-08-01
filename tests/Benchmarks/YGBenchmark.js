@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var Yoga = Yoga || require("../../dist/entry-" + process.env.TEST_ENTRY);
+var Yoga = Yoga || require("../../dist/Yoga.js");
 
 var ITERATIONS = 2000;
 
