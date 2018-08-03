@@ -1,3 +1,4 @@
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const path = require('path')
 
 const webConfig = {
@@ -15,6 +16,11 @@ const webConfig = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
+  },
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin()
+    ]
   },
   output: {
     library: 'Yoga',
@@ -38,6 +44,11 @@ const nodeConfig = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
+  },
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin()
+    ]
   },
   output: {
     library: 'Yoga',

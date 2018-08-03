@@ -1,4 +1,7 @@
 {
+  "name": "typeflex",
+  "version": "0.0.1",
+  "description": "Typescript implementation of CSS flexbox layout algorithm, a pure typescript port of Facebook's Yoga",
   "license": "MIT",
   "dependencies": {
     "babel-core": "^6.26.3",
@@ -6,6 +9,8 @@
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
     "typescript": "^2.9.2",
+    "uglifyjs": "^2.4.11",
+    "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.1.0"
   },
