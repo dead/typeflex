@@ -11,6 +11,6 @@ Typescript implementation of CSS flexbox layout algorithm, a pure typescript por
 
 The main reason of this port is to be able to run Yoga in older devices that don't support asm.js and WebAssembly.
 
-And it is possible to compile it to WebAssembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
+~~And it is possible to compile it to WebAssembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).~~ (not yet)
 
 This was inspired by https://github.com/kjk/flex (golang yoga port)
