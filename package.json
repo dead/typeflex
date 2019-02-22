@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Typescript implementation of CSS flexbox layout algorithm, a pure typescript port of Facebook's Yoga",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "babel-core": "^6.26.3",
     "mocha": "^5.2.0",
     "ts-loader": "^4.4.2",
@@ -18,5 +18,26 @@
     "build": "webpack --config webpack.config.js",
     "test": "yarn build && mocha --expose-gc -r tests/tools.js tests/Facebook.Yoga/**/*.js",
     "benchmark": "yarn build && node tests/run-bench tests/Benchmarks/YGBenchmark.js"
-  }
+  },
+  "main": "dist/Yoga.js",
+  "types": "dist/out/api.d.ts",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dead/typeflex.git"
+  },
+  "keywords": [
+    "flex",
+    "flexbox",
+    "yoga",
+    "typescript",
+    "javascript"
+  ],
+  "author": "dead",
+  "bugs": {
+    "url": "https://github.com/dead/typeflex/issues"
+  },
+  "homepage": "https://github.com/dead/typeflex#readme"
 }
