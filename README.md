@@ -1,5 +1,8 @@
 # typeflex
 
+[![CircleCI](https://circleci.com/gh/dead/typeflex/tree/master.svg?style=svg)](https://circleci.com/gh/dead/typeflex/tree/master)
+[![NPM](https://nodei.co/npm/typeflex.png?mini=true)](https://nodei.co/npm/typeflex/)
+
 Typescript implementation of CSS flexbox layout algorithm, a pure typescript port of Facebook's Yoga.
 
 ## Status
