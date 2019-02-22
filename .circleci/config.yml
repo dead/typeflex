@@ -1,9 +1,11 @@
 version: 2
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:10.15.0
 jobs:
   test:
-    docker:
-      - image: circleci/node:10.15.0
-    working_directory: ~/repo
+    <<: *defaults  
     steps:
       - checkout
       - restore_cache:
@@ -16,10 +18,11 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: yarn test
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
   publish:
-    working_directory: ~/repo
-    docker:
-    - image: circleci/node:10.15.0
+    <<: *defaults  
     steps:
     - attach_workspace:
         at: ~/repo
