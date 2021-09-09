@@ -8,11 +8,11 @@ export enum YGAlign {
     Stretch,
     Baseline,
     SpaceBetween,
-    SpaceAround
+    SpaceAround,
 }
 
-export function YGAlignToString(value : YGAlign): string {
-    switch(value) {
+export function YGAlignToString(value: YGAlign): string {
+    switch (value) {
         case YGAlign.Auto:
             return "auto";
         case YGAlign.FlexStart:
@@ -30,7 +30,7 @@ export function YGAlignToString(value : YGAlign): string {
         case YGAlign.SpaceAround:
             return "space-around";
     }
-    
+
     return "unknown";
 }
 
@@ -38,11 +38,11 @@ export const YGDimensionCount = 2;
 
 export enum YGDimension {
     Width,
-    Height
+    Height,
 }
 
-export function YGDimensionToString(value : YGDimension) : string {
-    switch(value) {
+export function YGDimensionToString(value: YGDimension): string {
+    switch (value) {
         case YGDimension.Width:
             return "width";
         case YGDimension.Height:
@@ -55,11 +55,11 @@ export function YGDimensionToString(value : YGDimension) : string {
 export enum YGDirection {
     Inherit,
     LTR,
-    RTL
+    RTL,
 }
 
-export function YGDirectionToString(value : YGDirection) : string {
-    switch(value) {
+export function YGDirectionToString(value: YGDirection): string {
+    switch (value) {
         case YGDirection.Inherit:
             return "inherit";
         case YGDirection.LTR:
@@ -75,11 +75,11 @@ export const YGDisplayCount = 2;
 
 export enum YGDisplay {
     Flex,
-    None
+    None,
 }
 
-export function YGDisplayToString(value : YGDisplay) : string {
-    switch(value) {
+export function YGDisplayToString(value: YGDisplay): string {
+    switch (value) {
         case YGDisplay.Flex:
             return "flex";
         case YGDisplay.None:
@@ -88,7 +88,6 @@ export function YGDisplayToString(value : YGDisplay) : string {
 
     return "unknown";
 }
-
 
 export const YGEdgeCount = 9;
 
@@ -101,11 +100,11 @@ export enum YGEdge {
     End,
     Horizontal,
     Vertical,
-    All
+    All,
 }
 
-export function YGEdgeToString(value : YGEdge) : string {
-    switch(value) {
+export function YGEdgeToString(value: YGEdge): string {
+    switch (value) {
         case YGEdge.Left:
             return "left";
         case YGEdge.Top:
@@ -132,11 +131,11 @@ export function YGEdgeToString(value : YGEdge) : string {
 export const YGExperimentalFeatureCount = 1;
 
 export enum YGExperimentalFeature {
-    WebFlexBasis
+    WebFlexBasis,
 }
 
-export function YGExperimentalFeatureToString(value : YGExperimentalFeature) : string {
-    switch(value) {
+export function YGExperimentalFeatureToString(value: YGExperimentalFeature): string {
+    switch (value) {
         case YGExperimentalFeature.WebFlexBasis:
             return "web-flex-basis";
     }
@@ -150,11 +149,11 @@ export enum YGFlexDirection {
     Column,
     ColumnReverse,
     Row,
-    RowReverse
+    RowReverse,
 }
 
-export function YGFlexDirectionToString(value : YGFlexDirection) : string {
-    switch(value) {
+export function YGFlexDirectionToString(value: YGFlexDirection): string {
+    switch (value) {
         case YGFlexDirection.Column:
             return "column";
         case YGFlexDirection.ColumnReverse:
@@ -176,11 +175,11 @@ export enum YGJustify {
     FlexEnd,
     SpaceBetween,
     SpaceAround,
-    SpaceEvenly
+    SpaceEvenly,
 }
 
-export function YGJustifyToString(value : YGJustify) : string {
-    switch(value) {
+export function YGJustifyToString(value: YGJustify): string {
+    switch (value) {
         case YGJustify.FlexStart:
             return "flex-start";
         case YGJustify.Center:
@@ -206,11 +205,11 @@ export enum YGLogLevel {
     Info,
     Debug,
     Verbose,
-    Fatal
+    Fatal,
 }
 
-export function YGLogLevelToString(value : YGLogLevel) : string {
-    switch(value) {
+export function YGLogLevelToString(value: YGLogLevel): string {
+    switch (value) {
         case YGLogLevel.Error:
             return "error";
         case YGLogLevel.Warn:
@@ -233,11 +232,11 @@ export const YGMeasureModeCount = 3;
 export enum YGMeasureMode {
     Undefined,
     Exactly,
-    AtMost
+    AtMost,
 }
 
-export function YGMeasureModeToString(value : YGMeasureMode) : string {
-    switch(value) {
+export function YGMeasureModeToString(value: YGMeasureMode): string {
+    switch (value) {
         case YGMeasureMode.Undefined:
             return "undefined";
         case YGMeasureMode.Exactly:
@@ -253,11 +252,11 @@ export const YGNodeTypeCount = 2;
 
 export enum YGNodeType {
     Default,
-    Text
+    Text,
 }
 
-export function YGNodeTypeToString(value : YGNodeType) : string {
-    switch(value) {
+export function YGNodeTypeToString(value: YGNodeType): string {
+    switch (value) {
         case YGNodeType.Default:
             return "default";
         case YGNodeType.Text:
@@ -272,11 +271,11 @@ export const YGOverflowCount = 3;
 export enum YGOverflow {
     Visible,
     Hidden,
-    Scroll
+    Scroll,
 }
 
-export function YGOverflowToString(value : YGOverflow) : string {
-    switch(value) {
+export function YGOverflowToString(value: YGOverflow): string {
+    switch (value) {
         case YGOverflow.Visible:
             return "visible";
         case YGOverflow.Hidden:
@@ -292,11 +291,11 @@ export const YGPositionTypeCount = 2;
 
 export enum YGPositionType {
     Relative,
-    Absolute
+    Absolute,
 }
 
-export function YGPositionTypeToString(value : YGPositionType) : string {
-    switch(value) {
+export function YGPositionTypeToString(value: YGPositionType): string {
+    switch (value) {
         case YGPositionType.Relative:
             return "relative";
         case YGPositionType.Absolute:
@@ -311,11 +310,11 @@ export const YGPrintOptionsCount = 3;
 export enum YGPrintOptions {
     Layout = 1,
     Style = 2,
-    Children = 4
+    Children = 4,
 }
 
-export function YGPrintOptionsToString(value : YGPrintOptions) : string {
-    switch(value) {
+export function YGPrintOptionsToString(value: YGPrintOptions): string {
+    switch (value) {
         case YGPrintOptions.Layout:
             return "layout";
         case YGPrintOptions.Style:
@@ -333,11 +332,11 @@ export enum YGUnit {
     Undefined,
     Point,
     Percent,
-    Auto
+    Auto,
 }
 
-export function YGUnitToString(value : YGUnit) : string {
-    switch(value) {
+export function YGUnitToString(value: YGUnit): string {
+    switch (value) {
         case YGUnit.Undefined:
             return "undefined";
         case YGUnit.Point:
@@ -356,11 +355,11 @@ export const YGWrapCount = 3;
 export enum YGWrap {
     NoWrap,
     Wrap,
-    WrapReverse
+    WrapReverse,
 }
 
-export function YGWrapToString(value : YGWrap) : string {
-    switch(value) {
+export function YGWrapToString(value: YGWrap): string {
+    switch (value) {
         case YGWrap.NoWrap:
             return "no-wrap";
         case YGWrap.Wrap:

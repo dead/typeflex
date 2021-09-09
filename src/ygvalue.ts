@@ -1,6 +1,4 @@
-import {
-    YGUnit
-} from "./enums";
+import { YGUnit } from "./enums";
 
 export class YGValue {
     public value: number;
@@ -12,6 +10,6 @@ export class YGValue {
     }
 
     clone(): YGValue {
-        return new YGValue(this.value, this.unit)
+        return new YGValue(this.value, this.unit);
     }
 }

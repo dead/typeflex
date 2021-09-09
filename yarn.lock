@@ -3440,6 +3440,15 @@ fsevents@^1.2.2:
   languageName: node
   linkType: hard
 
+"prettier@npm:^2.3.2":
+  version: 2.3.2
+  resolution: "prettier@npm:2.3.2"
+  bin:
+    prettier: bin-prettier.js
+  checksum: 17ce5784ac67621c292df58e2da60b2ee150c2d6aebea22a6ad9e52fcd6a5e66c349d0a8436ea3bd8ff9d778920a5f68000d7625b74f43558718a49755aa5259
+  languageName: node
+  linkType: hard
+
 "private@npm:^0.1.8":
   version: 0.1.8
   resolution: "private@npm:0.1.8"
@@ -4404,6 +4413,7 @@ fsevents@^1.2.2:
   dependencies:
     babel-core: ^6.26.3
     mocha: ^5.2.0
+    prettier: ^2.3.2
     ts-loader: ^4.4.2
     ts-node: ^7.0.0
     typescript: ^2.9.2

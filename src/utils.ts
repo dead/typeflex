@@ -1,15 +1,8 @@
-import {
-    YGUnit,
-    YGFlexDirection,
-    YGDirection
-} from './enums';
+import { YGUnit, YGFlexDirection, YGDirection } from "./enums";
 
-import { YGFloatOptional } from './ygfloatoptional';
+import { YGFloatOptional } from "./ygfloatoptional";
 
-import {
-    YGFloatIsUndefined,
-    YGUndefined
-} from "./yoga";
+import { YGFloatIsUndefined, YGUndefined } from "./yoga";
 
 import { YGNode } from "./ygnode";
 import { YGValue } from "./ygvalue";
@@ -92,7 +85,9 @@ export function YGUnwrapFloatOptional(op: YGFloatOptional): number {
 }
 
 export function YGFlexDirectionCross(flexDirection: YGFlexDirection, direction: YGDirection): YGFlexDirection {
-    return YGFlexDirectionIsColumn(flexDirection) ? YGResolveFlexDirection(YGFlexDirection.Row, direction) : YGFlexDirection.Column;
+    return YGFlexDirectionIsColumn(flexDirection)
+        ? YGResolveFlexDirection(YGFlexDirection.Row, direction)
+        : YGFlexDirection.Column;
 }
 
 export function YGFlexDirectionIsRow(flexDirection: YGFlexDirection): boolean {
