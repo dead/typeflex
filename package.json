@@ -41,18 +41,5 @@
   "bugs": {
     "url": "https://github.com/dead/typeflex/issues"
   },
-  "homepage": "https://github.com/dead/typeflex#readme",
-  "prettier": {
-    "tabWidth": 2,
-    "printWidth": 120,
-    "overrides": [
-      {
-        "files": "src/**/*.ts",
-        "options": {
-          "tabWidth": 4,
-          "trailingComma": "all"
-        }
-      }
-    ]
-  }
+  "homepage": "https://github.com/dead/typeflex#readme"
 }
