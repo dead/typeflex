@@ -14,24 +14,24 @@ export enum YGAlign {
 export function YGAlignToString(value: YGAlign): string {
     switch (value) {
         case YGAlign.Auto:
-            return "auto";
+            return 'auto';
         case YGAlign.FlexStart:
-            return "flex-start";
+            return 'flex-start';
         case YGAlign.Center:
-            return "center";
+            return 'center';
         case YGAlign.FlexEnd:
-            return "flex-end";
+            return 'flex-end';
         case YGAlign.Stretch:
-            return "stretch";
+            return 'stretch';
         case YGAlign.Baseline:
-            return "baseline";
+            return 'baseline';
         case YGAlign.SpaceBetween:
-            return "space-between";
+            return 'space-between';
         case YGAlign.SpaceAround:
-            return "space-around";
+            return 'space-around';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGDimensionCount = 2;
@@ -44,12 +44,12 @@ export enum YGDimension {
 export function YGDimensionToString(value: YGDimension): string {
     switch (value) {
         case YGDimension.Width:
-            return "width";
+            return 'width';
         case YGDimension.Height:
-            return "height";
+            return 'height';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export enum YGDirection {
@@ -61,14 +61,14 @@ export enum YGDirection {
 export function YGDirectionToString(value: YGDirection): string {
     switch (value) {
         case YGDirection.Inherit:
-            return "inherit";
+            return 'inherit';
         case YGDirection.LTR:
-            return "ltr";
+            return 'ltr';
         case YGDirection.RTL:
-            return "rtl";
+            return 'rtl';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGDisplayCount = 2;
@@ -81,12 +81,12 @@ export enum YGDisplay {
 export function YGDisplayToString(value: YGDisplay): string {
     switch (value) {
         case YGDisplay.Flex:
-            return "flex";
+            return 'flex';
         case YGDisplay.None:
-            return "none";
+            return 'none';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGEdgeCount = 9;
@@ -106,26 +106,26 @@ export enum YGEdge {
 export function YGEdgeToString(value: YGEdge): string {
     switch (value) {
         case YGEdge.Left:
-            return "left";
+            return 'left';
         case YGEdge.Top:
-            return "top";
+            return 'top';
         case YGEdge.Right:
-            return "right";
+            return 'right';
         case YGEdge.Bottom:
-            return "bottom";
+            return 'bottom';
         case YGEdge.Start:
-            return "start";
+            return 'start';
         case YGEdge.End:
-            return "end";
+            return 'end';
         case YGEdge.Horizontal:
-            return "horizontal";
+            return 'horizontal';
         case YGEdge.Vertical:
-            return "vertical";
+            return 'vertical';
         case YGEdge.All:
-            return "all";
+            return 'all';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGExperimentalFeatureCount = 1;
@@ -137,10 +137,10 @@ export enum YGExperimentalFeature {
 export function YGExperimentalFeatureToString(value: YGExperimentalFeature): string {
     switch (value) {
         case YGExperimentalFeature.WebFlexBasis:
-            return "web-flex-basis";
+            return 'web-flex-basis';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGFlexDirectionCount = 4;
@@ -155,16 +155,16 @@ export enum YGFlexDirection {
 export function YGFlexDirectionToString(value: YGFlexDirection): string {
     switch (value) {
         case YGFlexDirection.Column:
-            return "column";
+            return 'column';
         case YGFlexDirection.ColumnReverse:
-            return "column-reverse";
+            return 'column-reverse';
         case YGFlexDirection.Row:
-            return "row";
+            return 'row';
         case YGFlexDirection.RowReverse:
-            return "row-reverse";
+            return 'row-reverse';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGJustifyCount = 6;
@@ -181,20 +181,20 @@ export enum YGJustify {
 export function YGJustifyToString(value: YGJustify): string {
     switch (value) {
         case YGJustify.FlexStart:
-            return "flex-start";
+            return 'flex-start';
         case YGJustify.Center:
-            return "center";
+            return 'center';
         case YGJustify.FlexEnd:
-            return "flex-end";
+            return 'flex-end';
         case YGJustify.SpaceBetween:
-            return "space-between";
+            return 'space-between';
         case YGJustify.SpaceAround:
-            return "space-around";
+            return 'space-around';
         case YGJustify.SpaceEvenly:
-            return "space-evenly";
+            return 'space-evenly';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGLogLevelCount = 6;
@@ -211,20 +211,20 @@ export enum YGLogLevel {
 export function YGLogLevelToString(value: YGLogLevel): string {
     switch (value) {
         case YGLogLevel.Error:
-            return "error";
+            return 'error';
         case YGLogLevel.Warn:
-            return "warn";
+            return 'warn';
         case YGLogLevel.Info:
-            return "info";
+            return 'info';
         case YGLogLevel.Debug:
-            return "debug";
+            return 'debug';
         case YGLogLevel.Verbose:
-            return "verbose";
+            return 'verbose';
         case YGLogLevel.Fatal:
-            return "fatal";
+            return 'fatal';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGMeasureModeCount = 3;
@@ -238,14 +238,14 @@ export enum YGMeasureMode {
 export function YGMeasureModeToString(value: YGMeasureMode): string {
     switch (value) {
         case YGMeasureMode.Undefined:
-            return "undefined";
+            return 'undefined';
         case YGMeasureMode.Exactly:
-            return "exactly";
+            return 'exactly';
         case YGMeasureMode.AtMost:
-            return "at-most";
+            return 'at-most';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGNodeTypeCount = 2;
@@ -258,12 +258,12 @@ export enum YGNodeType {
 export function YGNodeTypeToString(value: YGNodeType): string {
     switch (value) {
         case YGNodeType.Default:
-            return "default";
+            return 'default';
         case YGNodeType.Text:
-            return "text";
+            return 'text';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGOverflowCount = 3;
@@ -277,14 +277,14 @@ export enum YGOverflow {
 export function YGOverflowToString(value: YGOverflow): string {
     switch (value) {
         case YGOverflow.Visible:
-            return "visible";
+            return 'visible';
         case YGOverflow.Hidden:
-            return "hidden";
+            return 'hidden';
         case YGOverflow.Scroll:
-            return "scroll";
+            return 'scroll';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGPositionTypeCount = 2;
@@ -297,12 +297,12 @@ export enum YGPositionType {
 export function YGPositionTypeToString(value: YGPositionType): string {
     switch (value) {
         case YGPositionType.Relative:
-            return "relative";
+            return 'relative';
         case YGPositionType.Absolute:
-            return "absolute";
+            return 'absolute';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGPrintOptionsCount = 3;
@@ -316,14 +316,14 @@ export enum YGPrintOptions {
 export function YGPrintOptionsToString(value: YGPrintOptions): string {
     switch (value) {
         case YGPrintOptions.Layout:
-            return "layout";
+            return 'layout';
         case YGPrintOptions.Style:
-            return "style";
+            return 'style';
         case YGPrintOptions.Children:
-            return "children";
+            return 'children';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGUnitCount = 4;
@@ -338,16 +338,16 @@ export enum YGUnit {
 export function YGUnitToString(value: YGUnit): string {
     switch (value) {
         case YGUnit.Undefined:
-            return "undefined";
+            return 'undefined';
         case YGUnit.Point:
-            return "point";
+            return 'point';
         case YGUnit.Percent:
-            return "percent";
+            return 'percent';
         case YGUnit.Auto:
-            return "auto";
+            return 'auto';
     }
 
-    return "unknown";
+    return 'unknown';
 }
 
 export const YGWrapCount = 3;
@@ -361,12 +361,12 @@ export enum YGWrap {
 export function YGWrapToString(value: YGWrap): string {
     switch (value) {
         case YGWrap.NoWrap:
-            return "no-wrap";
+            return 'no-wrap';
         case YGWrap.Wrap:
-            return "wrap";
+            return 'wrap';
         case YGWrap.WrapReverse:
-            return "wrap-reverse";
+            return 'wrap-reverse';
     }
 
-    return "unknown";
+    return 'unknown';
 }

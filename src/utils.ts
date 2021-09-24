@@ -1,11 +1,11 @@
-import { YGUnit, YGFlexDirection, YGDirection } from "./enums";
+import { YGUnit, YGFlexDirection, YGDirection } from './enums';
 
-import { YGFloatOptional } from "./ygfloatoptional";
+import { YGFloatOptional } from './ygfloatoptional';
 
-import { YGFloatIsUndefined, YGUndefined } from "./yoga";
+import { YGFloatIsUndefined, YGUndefined } from './yoga';
 
-import { YGNode } from "./ygnode";
-import { YGValue } from "./ygvalue";
+import { YGNode } from './ygnode';
+import { YGValue } from './ygvalue';
 
 export class YGCollectFlexItemsRowValues {
     public itemsOnLine: number = 0;

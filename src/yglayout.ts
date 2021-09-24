@@ -1,8 +1,8 @@
-import { YGDirection } from "./enums";
-import { YGFloatOptional } from "./ygfloatoptional";
-import { YGCachedMeasurement } from "./internal";
-import { YGFloatArrayEqual } from "./utils";
-import { YGFloatIsUndefined } from "./yoga";
+import { YGDirection } from './enums';
+import { YGFloatOptional } from './ygfloatoptional';
+import { YGCachedMeasurement } from './internal';
+import { YGFloatArrayEqual } from './utils';
+import { YGFloatIsUndefined } from './yoga';
 
 const kYGDefaultDimensionValues: () => [number, number] = () => [undefined, undefined];
 const YG_MAX_CACHED_RESULT_COUNT: number = 16;

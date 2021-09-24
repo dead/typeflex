@@ -8,10 +8,10 @@ import {
     YGDimensionCount,
     YGPositionType,
     YGAlign,
-} from "./enums";
+} from './enums';
 
-import { YGFloatOptional } from "./ygfloatoptional";
-import { YGConfig } from "./ygconfig";
+import { YGFloatOptional } from './ygfloatoptional';
+import { YGConfig } from './ygconfig';
 
 import {
     YGFlexDirectionIsRow,
@@ -23,13 +23,13 @@ import {
     YGResolveFlexDirection,
     YGValueEqual,
     YGUnwrapFloatOptional,
-} from "./utils";
+} from './utils';
 
-import { YGLayout } from "./yglayout";
-import { YGStyle } from "./ygstyle";
-import { YGValue } from "./ygvalue";
+import { YGLayout } from './yglayout';
+import { YGStyle } from './ygstyle';
+import { YGValue } from './ygvalue';
 
-import { trailing, leading, kDefaultFlexGrow, kDefaultFlexShrink, kWebDefaultFlexShrink } from "./internal";
+import { trailing, leading, kDefaultFlexGrow, kDefaultFlexShrink, kWebDefaultFlexShrink } from './internal';
 
 import {
     YGComputedEdgeValue,
@@ -43,7 +43,7 @@ import {
     YGValueUndefined,
     YGValueZero,
     YGValueAuto,
-} from "./yoga";
+} from './yoga';
 
 class YGNode {
     private context_: any;
@@ -95,7 +95,7 @@ class YGNode {
         resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined(), YGValueUndefined()],
     ) {
         if (contextOrNodeOrConfig instanceof YGNode) {
-            console.log("from node");
+            console.log('from node');
             this.fromNode(contextOrNodeOrConfig);
             return;
         }
@@ -406,7 +406,7 @@ class YGNode {
         } else {
             //YGAssertWithNode(this, this.children_.size() == 0, "Cannot set measure function: Nodes with measure functions cannot have children.");
             if (this.children_.length != 0) {
-                console.error("Cannot set measure function: Nodes with measure functions cannot have children.");
+                console.error('Cannot set measure function: Nodes with measure functions cannot have children.');
             }
             this.measure_ = measureFunc;
             this.setNodeType(YGNodeType.Text);

@@ -1,4 +1,4 @@
-import { YGFloatIsUndefined } from "./yoga";
+import { YGFloatIsUndefined } from './yoga';
 
 class YGFloatOptional {
     private value_: number;
@@ -26,7 +26,7 @@ class YGFloatOptional {
 
     getValue(): number {
         if (this.isUndefined_) {
-            throw "Tried to get value of an undefined YGFloatOptional";
+            throw 'Tried to get value of an undefined YGFloatOptional';
         }
 
         return this.value_;

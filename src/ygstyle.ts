@@ -9,12 +9,12 @@ import {
     YGDisplay,
     YGEdgeCount,
     YGUnit,
-} from "./enums";
+} from './enums';
 
-import { YGValueEqual, YGValueArrayEqual, cloneYGValueArray } from "./utils";
+import { YGValueEqual, YGValueArrayEqual, cloneYGValueArray } from './utils';
 
-import { YGValue } from "./ygvalue";
-import { YGFloatOptional } from "./ygfloatoptional";
+import { YGValue } from './ygvalue';
+import { YGFloatOptional } from './ygfloatoptional';
 
 const kYGValueUndefined: () => YGValue = () => new YGValue(0, YGUnit.Undefined);
 const kYGValueAuto: () => YGValue = () => new YGValue(0, YGUnit.Auto);

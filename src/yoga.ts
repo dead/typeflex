@@ -16,14 +16,14 @@ import {
     YGPrintOptions,
     YGExperimentalFeature,
     YGMeasureModeCount,
-} from "./enums";
+} from './enums';
 
-import { YGNode } from "./ygnode";
-import { YGConfig } from "./ygconfig";
-import { YGLayout } from "./yglayout";
-import { YGStyle } from "./ygstyle";
-import { YGFloatOptional } from "./ygfloatoptional";
-import { YGValue } from "./ygvalue";
+import { YGNode } from './ygnode';
+import { YGConfig } from './ygconfig';
+import { YGLayout } from './yglayout';
+import { YGStyle } from './ygstyle';
+import { YGFloatOptional } from './ygfloatoptional';
+import { YGValue } from './ygvalue';
 
 import {
     YGFloatSanitize,
@@ -38,7 +38,7 @@ import {
     YGFloatMin,
     YGCollectFlexItemsRowValues,
     YGFloatsEqual,
-} from "./utils";
+} from './utils';
 
 import {
     kDefaultFlexGrow,
@@ -50,7 +50,7 @@ import {
     dim,
     YGCachedMeasurement,
     YG_MAX_CACHED_RESULT_COUNT,
-} from "./internal";
+} from './internal';
 
 export class YGSize {
     public width: number;
@@ -233,7 +233,7 @@ export function YGNodeNew(): YGNode {
 }
 
 export function YGNodeClone(oldNode: YGNode) {
-    console.log("clone?");
+    console.log('clone?');
     const node: YGNode = new YGNode(oldNode);
     gNodeInstanceCount++;
     node.setOwner(null);
@@ -310,8 +310,8 @@ export function YGNodeFreeRecursive(root: YGNode): void {
 }
 
 export function YGNodeReset(node: YGNode): void {
-    YGAssertWithNode(node, YGNodeGetChildCount(node) == 0, "Cannot reset a node which still has children attached");
-    YGAssertWithNode(node, node.getOwner() == null, "Cannot reset a node still attached to a owner");
+    YGAssertWithNode(node, YGNodeGetChildCount(node) == 0, 'Cannot reset a node which still has children attached');
+    YGAssertWithNode(node, node.getOwner() == null, 'Cannot reset a node still attached to a owner');
 
     node.clearChildren();
     const config: YGConfig = node.getConfig();
@@ -349,11 +349,11 @@ export function YGConfigCopy(dest: YGConfig, src: YGConfig) {
 }
 
 export function YGNodeInsertChild(node: YGNode, child: YGNode, index: number): void {
-    YGAssertWithNode(node, child.getOwner() == null, "Child already has a owner, it must be removed first.");
+    YGAssertWithNode(node, child.getOwner() == null, 'Child already has a owner, it must be removed first.');
     YGAssertWithNode(
         node,
         node.getMeasure() == null,
-        "Cannot add child: Nodes with measure functions cannot have children.",
+        'Cannot add child: Nodes with measure functions cannot have children.',
     );
     node.cloneChildrenIfNeeded();
     node.insertChildIndex(child, index);
@@ -366,7 +366,7 @@ export function YGNodeInsertSharedChild(node: YGNode, child: YGNode, index: numb
     YGAssertWithNode(
         node,
         node.getMeasure() == null,
-        "Cannot add child: Nodes with measure functions cannot have children.",
+        'Cannot add child: Nodes with measure functions cannot have children.',
     );
     node.insertChildIndex(child, index);
     child.setOwner(null);
@@ -514,7 +514,7 @@ export function YGNodeMarkDirty(node: YGNode): void {
     YGAssertWithNode(
         node,
         node.getMeasure() != null,
-        "Only leaf nodes with custom measure functions should manually mark themselves as dirty",
+        'Only leaf nodes with custom measure functions should manually mark themselves as dirty',
     );
     node.markDirtyAndPropogate();
 }
@@ -1091,7 +1091,7 @@ export function YGNodeLayoutGetHadOverflow(node: YGNode): boolean {
     return node.getLayout().hadOverflow;
 }
 export function YGNodeLayoutGetMargin(node: YGNode, edge: YGEdge): number {
-    YGAssertWithNode(node, edge <= YGEdge.End, "Cannot get layout properties of multi-edge shorthands");
+    YGAssertWithNode(node, edge <= YGEdge.End, 'Cannot get layout properties of multi-edge shorthands');
 
     if (edge == YGEdge.Left) {
         if (node.getLayout().direction == YGDirection.RTL) {
@@ -1112,7 +1112,7 @@ export function YGNodeLayoutGetMargin(node: YGNode, edge: YGEdge): number {
     return node.getLayout().margin[edge];
 }
 export function YGNodeLayoutGetBorder(node: YGNode, edge: YGEdge): number {
-    YGAssertWithNode(node, edge <= YGEdge.End, "Cannot get layout properties of multi-edge shorthands");
+    YGAssertWithNode(node, edge <= YGEdge.End, 'Cannot get layout properties of multi-edge shorthands');
 
     if (edge == YGEdge.Left) {
         if (node.getLayout().direction == YGDirection.RTL) {
@@ -1133,7 +1133,7 @@ export function YGNodeLayoutGetBorder(node: YGNode, edge: YGEdge): number {
     return node.getLayout().border[edge];
 }
 export function YGNodeLayoutGetPadding(node: YGNode, edge: YGEdge): number {
-    YGAssertWithNode(node, edge <= YGEdge.End, "Cannot get layout properties of multi-edge shorthands");
+    YGAssertWithNode(node, edge <= YGEdge.End, 'Cannot get layout properties of multi-edge shorthands');
 
     if (edge == YGEdge.Left) {
         if (node.getLayout().direction == YGDirection.RTL) {
@@ -1320,7 +1320,7 @@ export function YGBaseline(node: YGNode): number {
             node.getLayout().measuredDimensions[YGDimension.Width],
             node.getLayout().measuredDimensions[YGDimension.Height],
         );
-        YGAssertWithNode(node, !YGFloatIsUndefined(baseline), "Expect custom baseline function to not return NaN");
+        YGAssertWithNode(node, !YGFloatIsUndefined(baseline), 'Expect custom baseline function to not return NaN');
         return baseline;
     }
 
@@ -1644,7 +1644,7 @@ export function YGNodeComputeFlexBasisForChild(
             ownerWidth,
             ownerHeight,
             false,
-            "measure",
+            'measure',
             config,
         );
 
@@ -1755,7 +1755,7 @@ export function YGNodeAbsoluteLayoutChild(
             childWidth,
             childHeight,
             false,
-            "abs-measure",
+            'abs-measure',
             config,
         );
 
@@ -1777,7 +1777,7 @@ export function YGNodeAbsoluteLayoutChild(
         childWidth,
         childHeight,
         true,
-        "abs-layout",
+        'abs-layout',
         config,
     );
 
@@ -1842,7 +1842,7 @@ export function YGNodeWithMeasureFuncSetMeasuredDimensions(
     ownerWidth: number,
     ownerHeight: number,
 ): void {
-    YGAssertWithNode(node, node.getMeasure() != null, "Expected node to have custom measure function");
+    YGAssertWithNode(node, node.getMeasure() != null, 'Expected node to have custom measure function');
 
     const paddingAndBorderAxisRow: number = YGNodePaddingAndBorderForAxis(node, YGFlexDirection.Row, availableWidth);
     const paddingAndBorderAxisColumn: number = YGNodePaddingAndBorderForAxis(
@@ -2381,7 +2381,7 @@ export function YGDistributeFreeSpaceSecondPass(
             availableInnerWidth,
             availableInnerHeight,
             performLayout && !requiresStretchLayout,
-            "flex",
+            'flex',
             config,
         );
 
@@ -2674,12 +2674,12 @@ export function YGNodelayoutImpl(
     YGAssertWithNode(
         node,
         YGFloatIsUndefined(availableWidth) ? widthMeasureMode == YGMeasureMode.Undefined : true,
-        "availableWidth is indefinite so widthMeasureMode must be YGMeasureMode.Undefined",
+        'availableWidth is indefinite so widthMeasureMode must be YGMeasureMode.Undefined',
     );
     YGAssertWithNode(
         node,
         YGFloatIsUndefined(availableHeight) ? heightMeasureMode == YGMeasureMode.Undefined : true,
-        "availableHeight is indefinite so heightMeasureMode must be YGMeasureMode.Undefined",
+        'availableHeight is indefinite so heightMeasureMode must be YGMeasureMode.Undefined',
     );
 
     const direction: YGDirection = node.resolveDirection(ownerDirection);
@@ -3040,7 +3040,7 @@ export function YGNodelayoutImpl(
                                 availableInnerWidth,
                                 availableInnerHeight,
                                 true,
-                                "stretch",
+                                'stretch',
                                 config,
                             );
                         }
@@ -3228,7 +3228,7 @@ export function YGNodelayoutImpl(
                                             availableInnerWidth,
                                             availableInnerHeight,
                                             true,
-                                            "multiline-stretch",
+                                            'multiline-stretch',
                                             config,
                                         );
                                     }
@@ -3390,7 +3390,7 @@ let gDepth: number = 0;
 const gPrintTree: boolean = false;
 const gPrintChanges: boolean = false;
 const gPrintSkips: boolean = false;
-const spacer: string = "                                                            ";
+const spacer: string = '                                                            ';
 
 export function YGSpacer(level: number): string {
     const spacerLen: number = spacer.length;
@@ -3402,11 +3402,11 @@ export function YGSpacer(level: number): string {
 }
 
 export function YGMeasureModeName(mode: YGMeasureMode, performLayout: boolean): string {
-    const kMeasureModeNames: Array<string> = ["UNDEFINED", "EXACTLY", "AT_MOST"];
-    const kLayoutModeNames: Array<string> = ["LAY_UNDEFINED", "LAY_EXACTLY", "LAY_AT_", "MOST"];
+    const kMeasureModeNames: Array<string> = ['UNDEFINED', 'EXACTLY', 'AT_MOST'];
+    const kLayoutModeNames: Array<string> = ['LAY_UNDEFINED', 'LAY_EXACTLY', 'LAY_AT_', 'MOST'];
 
     if (mode >= YGMeasureModeCount) {
-        return "";
+        return '';
     }
 
     return performLayout ? kLayoutModeNames[mode] : kMeasureModeNames[mode];
@@ -3659,14 +3659,14 @@ export function YGLayoutNodeInternal(
         layout.measuredDimensions[YGDimension.Height] = cachedResults.computedHeight;
 
         if (gPrintChanges && gPrintSkips) {
-            YGLog(node, YGLogLevel.Verbose, "%s%d.{[skipped] ", YGSpacer(gDepth), gDepth);
+            YGLog(node, YGLogLevel.Verbose, '%s%d.{[skipped] ', YGSpacer(gDepth), gDepth);
             if (node.getPrintFunc() != null) {
                 node.getPrintFunc()(node);
             }
             YGLog(
                 node,
                 YGLogLevel.Verbose,
-                "wm: %s, hm: %s, aw: %f ah: %f => d: (%f, %f) %s\n",
+                'wm: %s, hm: %s, aw: %f ah: %f => d: (%f, %f) %s\n',
                 YGMeasureModeName(widthMeasureMode, performLayout),
                 YGMeasureModeName(heightMeasureMode, performLayout),
                 availableWidth,
@@ -3678,14 +3678,14 @@ export function YGLayoutNodeInternal(
         }
     } else {
         if (gPrintChanges) {
-            YGLog(node, YGLogLevel.Verbose, "%s%d.{%s", YGSpacer(gDepth), gDepth, needToVisitNode ? "*" : "");
+            YGLog(node, YGLogLevel.Verbose, '%s%d.{%s', YGSpacer(gDepth), gDepth, needToVisitNode ? '*' : '');
             if (node.getPrintFunc() != null) {
                 node.getPrintFunc()(node);
             }
             YGLog(
                 node,
                 YGLogLevel.Verbose,
-                "wm: %s, hm: %s, aw: %f ah: %f %s\n",
+                'wm: %s, hm: %s, aw: %f ah: %f %s\n',
                 YGMeasureModeName(widthMeasureMode, performLayout),
                 YGMeasureModeName(heightMeasureMode, performLayout),
                 availableWidth,
@@ -3708,14 +3708,14 @@ export function YGLayoutNodeInternal(
         );
 
         if (gPrintChanges) {
-            YGLog(node, YGLogLevel.Verbose, "%s%d.}%s", YGSpacer(gDepth), gDepth, needToVisitNode ? "*" : "");
+            YGLog(node, YGLogLevel.Verbose, '%s%d.}%s', YGSpacer(gDepth), gDepth, needToVisitNode ? '*' : '');
             if (node.getPrintFunc() != null) {
                 node.getPrintFunc()(node);
             }
             YGLog(
                 node,
                 YGLogLevel.Verbose,
-                "wm: %s, hm: %s, d: (%f, %f) %s\n",
+                'wm: %s, hm: %s, d: (%f, %f) %s\n',
                 YGMeasureModeName(widthMeasureMode, performLayout),
                 YGMeasureModeName(heightMeasureMode, performLayout),
                 layout.measuredDimensions[YGDimension.Width],
@@ -3729,7 +3729,7 @@ export function YGLayoutNodeInternal(
         if (cachedResults == null) {
             if (layout.nextCachedMeasurementsIndex == YG_MAX_CACHED_RESULT_COUNT) {
                 if (gPrintChanges) {
-                    YGLog(node, YGLogLevel.Verbose, "Out of cache entries!\n");
+                    YGLog(node, YGLogLevel.Verbose, 'Out of cache entries!\n');
                 }
                 layout.nextCachedMeasurementsIndex = 0;
             }
@@ -3765,7 +3765,7 @@ export function YGLayoutNodeInternal(
 }
 
 export function YGConfigSetPointScaleFactor(config: YGConfig, pixelsInPoint: number): void {
-    YGAssertWithConfig(config, pixelsInPoint >= 0.0, "Scale factor should not be less than zero");
+    YGAssertWithConfig(config, pixelsInPoint >= 0.0, 'Scale factor should not be less than zero');
     if (pixelsInPoint == 0.0) {
         config.pointScaleFactor = 0.0;
     } else {
@@ -3892,7 +3892,7 @@ export function YGNodeCalculateLayout(
             ownerWidth,
             ownerHeight,
             true,
-            "initial",
+            'initial',
             node.getConfig(),
         )
     ) {
@@ -3905,7 +3905,7 @@ export function YGNodeCalculateLayout(
     }
 
     if (node.getConfig().shouldDiffLayoutWithoutLegacyStretchBehaviour && node.didUseLegacyFlag()) {
-        console.log("legacy config");
+        console.log('legacy config');
         const originalNode: YGNode = YGNodeDeepClone(node);
         originalNode.resolveDimension();
 
@@ -3924,7 +3924,7 @@ export function YGNodeCalculateLayout(
                 ownerWidth,
                 ownerHeight,
                 true,
-                "initial",
+                'initial',
                 originalNode.getConfig(),
             )
         ) {
@@ -3963,7 +3963,7 @@ export function YGVLog(config: YGConfig, node: YGNode, level: YGLogLevel, format
     logConfig.logger(logConfig, node, level, format, args);
 
     if (level == YGLogLevel.Fatal) {
-        throw new Error("Abort Yoga");
+        throw new Error('Abort Yoga');
     }
 }
 
@@ -3977,14 +3977,14 @@ export function YGLog(node: YGNode, level: YGLogLevel, format: string, ...args: 
 
 export function YGAssert(condition: boolean, message: string) {
     if (!condition) {
-        YGLog(null, YGLogLevel.Fatal, "%s\n", message);
+        YGLog(null, YGLogLevel.Fatal, '%s\n', message);
         //console.assert(condition, message);
     }
 }
 
 export function YGAssertWithNode(node: YGNode, condition: boolean, message: string): void {
     if (!condition) {
-        YGLog(node, YGLogLevel.Fatal, "%s\n", message);
+        YGLog(node, YGLogLevel.Fatal, '%s\n', message);
         //console.log(node);
         //console.assert(condition, message);
     }
@@ -3992,7 +3992,7 @@ export function YGAssertWithNode(node: YGNode, condition: boolean, message: stri
 
 export function YGAssertWithConfig(config: YGConfig, condition: boolean, message: string) {
     if (!condition) {
-        YGLogWithConfig(config, YGLogLevel.Fatal, "%s\n", message);
+        YGLogWithConfig(config, YGLogLevel.Fatal, '%s\n', message);
         //console.log(config);
         //console.assert(condition, message);
     }

@@ -1,4 +1,4 @@
-import { YGLogger, YGCloneNodeFunc } from "./yoga";
+import { YGLogger, YGCloneNodeFunc } from './yoga';
 
 const kYGDefaultExperimentalFeatures: () => Array<boolean> = () => [false, false, false];
 

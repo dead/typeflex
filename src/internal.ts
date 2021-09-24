@@ -1,8 +1,8 @@
-import { YGMeasureMode, YGEdge, YGUnit, YGLogLevel, YGDimension } from "./enums";
+import { YGMeasureMode, YGEdge, YGUnit, YGLogLevel, YGDimension } from './enums';
 
-import { YGNode } from "./ygnode";
+import { YGNode } from './ygnode';
 
-import { YGFloatIsUndefined } from "./yoga";
+import { YGFloatIsUndefined } from './yoga';
 
 export class YGCachedMeasurement {
     public availableWidth: number;

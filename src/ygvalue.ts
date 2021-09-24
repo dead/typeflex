@@ -1,4 +1,4 @@
-import { YGUnit } from "./enums";
+import { YGUnit } from './enums';
 
 export class YGValue {
     public value: number;
