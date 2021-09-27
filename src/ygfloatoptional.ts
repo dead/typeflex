@@ -1,12 +1,10 @@
-import {
-    YGFloatIsUndefined
-} from "./yoga";
+import { YGFloatIsUndefined } from './yoga';
 
 class YGFloatOptional {
     private value_: number;
     private isUndefined_: boolean;
-    
-    constructor(value: number|YGFloatOptional = undefined) {
+
+    constructor(value: number | YGFloatOptional = undefined) {
         if (value instanceof YGFloatOptional) {
             this.value_ = value.getValue();
             this.isUndefined_ = value.isUndefined();
@@ -23,12 +21,12 @@ class YGFloatOptional {
     }
 
     clone(): YGFloatOptional {
-        return new YGFloatOptional(this.isUndefined_ ? undefined : this.value_)
+        return new YGFloatOptional(this.isUndefined_ ? undefined : this.value_);
     }
 
     getValue(): number {
         if (this.isUndefined_) {
-            throw "Tried to get value of an undefined YGFloatOptional";
+            throw 'Tried to get value of an undefined YGFloatOptional';
         }
 
         return this.value_;
@@ -97,6 +95,4 @@ class YGFloatOptional {
     }
 }
 
-export {
-    YGFloatOptional
-}
+export { YGFloatOptional };

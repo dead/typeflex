@@ -8,17 +8,13 @@ import {
     YGOverflow,
     YGDisplay,
     YGEdgeCount,
-    YGUnit
-} from "./enums";
+    YGUnit,
+} from './enums';
 
-import {
-    YGValueEqual,
-    YGValueArrayEqual,
-    cloneYGValueArray
-} from "./utils";
+import { YGValueEqual, YGValueArrayEqual, cloneYGValueArray } from './utils';
 
-import { YGValue } from "./ygvalue";
-import { YGFloatOptional } from "./ygfloatoptional";
+import { YGValue } from './ygvalue';
+import { YGFloatOptional } from './ygfloatoptional';
 
 const kYGValueUndefined: () => YGValue = () => new YGValue(0, YGUnit.Undefined);
 const kYGValueAuto: () => YGValue = () => new YGValue(0, YGUnit.Auto);
@@ -31,7 +27,7 @@ const kYGDefaultEdgeValuesUnit: () => Array<YGValue> = () => [
     kYGValueUndefined(),
     kYGValueUndefined(),
     kYGValueUndefined(),
-    kYGValueUndefined()
+    kYGValueUndefined(),
 ];
 const kYGDefaultDimensionValuesAutoUnit: () => [YGValue, YGValue] = () => [kYGValueAuto(), kYGValueAuto()];
 const kYGDefaultDimensionValuesUnit: () => [YGValue, YGValue] = () => [kYGValueUndefined(), kYGValueUndefined()];
@@ -71,7 +67,7 @@ class YGStyle {
         this.flexWrap = YGWrap.NoWrap;
         this.overflow = YGOverflow.Visible;
         this.display = YGDisplay.Flex;
-        this.flex = new YGFloatOptional();  
+        this.flex = new YGFloatOptional();
         this.flexGrow = new YGFloatOptional();
         this.flexShrink = new YGFloatOptional();
         this.flexBasis = kYGValueAuto();
@@ -79,32 +75,33 @@ class YGStyle {
         this.position = kYGDefaultEdgeValuesUnit();
         this.padding = kYGDefaultEdgeValuesUnit();
         this.border = kYGDefaultEdgeValuesUnit();
-        this.dimensions = kYGDefaultDimensionValuesAutoUnit(); 
+        this.dimensions = kYGDefaultDimensionValuesAutoUnit();
         this.minDimensions = kYGDefaultDimensionValuesUnit();
         this.maxDimensions = kYGDefaultDimensionValuesUnit();
         this.aspectRatio = new YGFloatOptional();
     }
 
     isEqual(style: YGStyle): boolean {
-        let areNonFloatValuesEqual: boolean = this.direction == style.direction &&
-                                              this.flexDirection == style.flexDirection &&
-                                              this.justifyContent == style.justifyContent &&
-                                              this.alignContent == style.alignContent &&
-                                              this.alignItems == style.alignItems &&
-                                              this.alignSelf == style.alignSelf &&
-                                              this.positionType == style.positionType &&
-                                              this.flexWrap == style.flexWrap &&
-                                              this.overflow == style.overflow &&
-                                              this.display == style.display &&
-                                              YGValueEqual(this.flexBasis, style.flexBasis) &&
-                                              YGValueArrayEqual(this.margin, style.margin) &&
-                                              YGValueArrayEqual(this.position, style.position) &&
-                                              YGValueArrayEqual(this.padding, style.padding) &&
-                                              YGValueArrayEqual(this.border, style.border) &&
-                                              YGValueArrayEqual(this.dimensions, style.dimensions) &&
-                                              YGValueArrayEqual(this.minDimensions, style.minDimensions) &&
-                                              YGValueArrayEqual(this.maxDimensions, style.maxDimensions);
-        
+        let areNonFloatValuesEqual: boolean =
+            this.direction == style.direction &&
+            this.flexDirection == style.flexDirection &&
+            this.justifyContent == style.justifyContent &&
+            this.alignContent == style.alignContent &&
+            this.alignItems == style.alignItems &&
+            this.alignSelf == style.alignSelf &&
+            this.positionType == style.positionType &&
+            this.flexWrap == style.flexWrap &&
+            this.overflow == style.overflow &&
+            this.display == style.display &&
+            YGValueEqual(this.flexBasis, style.flexBasis) &&
+            YGValueArrayEqual(this.margin, style.margin) &&
+            YGValueArrayEqual(this.position, style.position) &&
+            YGValueArrayEqual(this.padding, style.padding) &&
+            YGValueArrayEqual(this.border, style.border) &&
+            YGValueArrayEqual(this.dimensions, style.dimensions) &&
+            YGValueArrayEqual(this.minDimensions, style.minDimensions) &&
+            YGValueArrayEqual(this.maxDimensions, style.maxDimensions);
+
         areNonFloatValuesEqual = areNonFloatValuesEqual && this.flex.isUndefined() == style.flex.isUndefined();
         if (areNonFloatValuesEqual && !this.flex.isUndefined() && !style.flex.isUndefined()) {
             areNonFloatValuesEqual = areNonFloatValuesEqual && this.flex.getValue() == style.flex.getValue();
@@ -115,13 +112,16 @@ class YGStyle {
             areNonFloatValuesEqual = areNonFloatValuesEqual && this.flexGrow.getValue() == style.flexGrow.getValue();
         }
 
-        areNonFloatValuesEqual = areNonFloatValuesEqual && this.flexShrink.isUndefined() == style.flexShrink.isUndefined();
+        areNonFloatValuesEqual =
+            areNonFloatValuesEqual && this.flexShrink.isUndefined() == style.flexShrink.isUndefined();
         if (areNonFloatValuesEqual && !style.flexShrink.isUndefined()) {
-            areNonFloatValuesEqual = areNonFloatValuesEqual && this.flexShrink.getValue() == style.flexShrink.getValue();
+            areNonFloatValuesEqual =
+                areNonFloatValuesEqual && this.flexShrink.getValue() == style.flexShrink.getValue();
         }
 
         if (!(this.aspectRatio.isUndefined() && style.aspectRatio.isUndefined())) {
-            areNonFloatValuesEqual = areNonFloatValuesEqual && this.aspectRatio.getValue() == style.aspectRatio.getValue();
+            areNonFloatValuesEqual =
+                areNonFloatValuesEqual && this.aspectRatio.getValue() == style.aspectRatio.getValue();
         }
 
         return areNonFloatValuesEqual;
@@ -143,9 +143,9 @@ class YGStyle {
         newStyle.flexWrap = this.flexWrap;
         newStyle.overflow = this.overflow;
         newStyle.display = this.display;
-        newStyle.flex = this.flex.clone(); 
-        newStyle.flexGrow = this.flexGrow.clone(); 
-        newStyle.flexShrink = this.flexShrink.clone(); 
+        newStyle.flex = this.flex.clone();
+        newStyle.flexGrow = this.flexGrow.clone();
+        newStyle.flexShrink = this.flexShrink.clone();
         newStyle.flexBasis = this.flexBasis.clone();
         newStyle.margin = cloneYGValueArray(this.margin);
         newStyle.position = cloneYGValueArray(this.position);
@@ -159,7 +159,4 @@ class YGStyle {
     }
 }
 
-
-export {
-    YGStyle
-}
+export { YGStyle };

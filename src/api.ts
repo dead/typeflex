@@ -13,8 +13,8 @@ import {
     YGOverflow,
     YGPositionType,
     YGUnit,
-    YGWrap
-} from "./enums";
+    YGWrap,
+} from './enums';
 
 import {
     YGNodeCalculateLayout,
@@ -109,12 +109,12 @@ import {
     YGNodeNew,
     YGNodeStyleSetPosition,
     YGNodeGetInstanceCount,
-} from "./yoga"
+} from './yoga';
 
-import { YGNode } from "./ygnode"
-import { YGValue } from "./ygvalue"
-import { YGConfig } from "./ygconfig"
-import { YGFloatSanitize } from "./utils"
+import { YGNode } from './ygnode';
+import { YGValue } from './ygvalue';
+import { YGConfig } from './ygconfig';
+import { YGFloatSanitize } from './utils';
 
 export const ALIGN_AUTO = YGAlign.Auto;
 export const ALIGN_FLEX_START = YGAlign.FlexStart;
@@ -199,7 +199,7 @@ export class Size {
         }
     }
 
-    static fromJS(obj: {width: number, height: number}) {
+    static fromJS(obj: { width: number; height: number }) {
         return new Size(obj.width, obj.height);
     }
 }
@@ -227,7 +227,7 @@ export class Config {
     }
 
     constructor() {
-        this.config = YGConfigNew()
+        this.config = YGConfigNew();
     }
 
     free() {
@@ -248,11 +248,11 @@ export class Config {
 }
 
 function fromYGNode(node: YGNode): Node {
-    return YGNodeGetContext(node) as Node
+    return YGNodeGetContext(node) as Node;
 }
 
 function fromYGValue(val: YGValue): Value {
-    return new Value(val.unit, val.value)
+    return new Value(val.unit, val.value);
 }
 
 export class Node {
@@ -261,8 +261,7 @@ export class Node {
     static create(config?: Config) {
         if (config) {
             return new Node(config);
-        }
-        else {
+        } else {
             return new Node();
         }
     }
@@ -272,14 +271,14 @@ export class Node {
     }
 
     static createWithConfig(config: Config) {
-        return new Node(config)
+        return new Node(config);
     }
 
     constructor(config?: Config) {
         if (!config) {
-            this.node = YGNodeNew()
+            this.node = YGNodeNew();
         } else {
-            this.node = YGNodeNewWithConfig(config.config)
+            this.node = YGNodeNewWithConfig(config.config);
         }
 
         YGNodeSetContext(this.node, this);
@@ -442,7 +441,7 @@ export class Node {
             return undefined;
         }
 
-        return fromYGNode(parent)
+        return fromYGNode(parent);
     }
 
     getPosition(edge: YGEdge): Value {
@@ -542,8 +541,7 @@ export class Node {
         if (typeof height === 'string') {
             if (height === 'auto') {
                 this.setHeightAuto();
-            }
-            else if (height[height.length - 1] === '%') {
+            } else if (height[height.length - 1] === '%') {
                 this.setHeightPercent(parseFloat(height));
             } else {
                 throw new Error('Invalid input type.');
@@ -569,8 +567,7 @@ export class Node {
         if (typeof margin === 'string') {
             if (margin === 'auto') {
                 this.setMarginAuto(edge);
-            }
-            else if (margin[margin.length - 1] === '%') {
+            } else if (margin[margin.length - 1] === '%') {
                 this.setMarginPercent(edge, parseFloat(margin));
             } else {
                 throw new Error('Invalid input type.');
@@ -591,7 +588,7 @@ export class Node {
     setMaxHeight(maxHeight: number | string): void {
         if (typeof maxHeight === 'string') {
             if (maxHeight[maxHeight.length - 1] === '%') {
-                this.setMaxHeightPercent(parseFloat(maxHeight))
+                this.setMaxHeightPercent(parseFloat(maxHeight));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -607,7 +604,7 @@ export class Node {
     setMaxWidth(maxWidth: number | string): void {
         if (typeof maxWidth === 'string') {
             if (maxWidth[maxWidth.length - 1] === '%') {
-                this.setMaxWidthPercent(parseFloat(maxWidth))
+                this.setMaxWidthPercent(parseFloat(maxWidth));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -635,7 +632,7 @@ export class Node {
     setMinHeight(minHeight: number | string): void {
         if (typeof minHeight === 'string') {
             if (minHeight[minHeight.length - 1] === '%') {
-                this.setMinHeightPercent(parseFloat(minHeight))
+                this.setMinHeightPercent(parseFloat(minHeight));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -651,7 +648,7 @@ export class Node {
     setMinWidth(minWidth: number | string): void {
         if (typeof minWidth === 'string') {
             if (minWidth[minWidth.length - 1] === '%') {
-                this.setMinWidthPercent(parseFloat(minWidth))
+                this.setMinWidthPercent(parseFloat(minWidth));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -671,7 +668,7 @@ export class Node {
     setPadding(edge: YGEdge, padding: number | string): void {
         if (typeof padding === 'string') {
             if (padding[padding.length - 1] === '%') {
-                this.setPaddingPercent(edge, parseFloat(padding))
+                this.setPaddingPercent(edge, parseFloat(padding));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -687,7 +684,7 @@ export class Node {
     setPosition(edge: YGEdge, position: number | string): void {
         if (typeof position === 'string') {
             if (position[position.length - 1] === '%') {
-                this.setPositionPercent(edge, parseFloat(position))
+                this.setPositionPercent(edge, parseFloat(position));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -731,7 +728,6 @@ export class Node {
     }
 }
 
-
 export function getInstanceCount(): number {
-    return YGNodeGetInstanceCount()
+    return YGNodeGetInstanceCount();
 }

@@ -6,6 +6,7 @@
   "devDependencies": {
     "babel-core": "^6.26.3",
     "mocha": "^5.2.0",
+    "prettier": "^2.3.2",
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
     "typescript": "^2.9.2",
@@ -17,7 +18,8 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "test": "yarn build && mocha --expose-gc -r tests/tools.js tests/Facebook.Yoga/**/*.js",
-    "benchmark": "yarn build && node tests/run-bench tests/Benchmarks/YGBenchmark.js"
+    "benchmark": "yarn build && node tests/run-bench tests/Benchmarks/YGBenchmark.js",
+    "format": "prettier -w src/**/*.ts"
   },
   "main": "dist/Yoga.js",
   "types": "dist/out/api.d.ts",

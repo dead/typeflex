@@ -37,9 +37,9 @@ export function YGNodeStyleSet##name##Percent(node: YGNode, paramName: type): vo
     if ((node.getStyle().instanceName.value != value.value && value.unit != YGUnit.Undefined) ||
         node.getStyle().instanceName.unit != value.unit) {
         const style: YGStyle = node.getStyle();
-        style.instanceName = value;                  
-        node.setStyle(style);                       
-        node.markDirtyAndPropogate();               
+        style.instanceName = value;
+        node.setStyle(style);
+        node.markDirtyAndPropogate();
     }
 }
 '''
