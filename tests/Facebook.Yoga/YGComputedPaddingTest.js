@@ -1,9 +1,11 @@
 /**
- * Copyright (c) 2014-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+
+// upstream: https://github.com/facebook/yoga/blob/342aebe1d73e5770a1862b6a94c6b877c1439a9b/javascript/tests/Facebook.Yoga/YGComputedPaddingTest.js
 
 var Yoga = Yoga || require("../../dist/Yoga.js");
 
@@ -27,5 +29,5 @@ it("padding_start", function () {
     root.freeRecursive();
 
   (typeof gc !== "undefined") && gc();
-  console.assert(0 === Yoga.getInstanceCount(), "0 === Yoga.getInstanceCount() (" + Yoga.getInstanceCount() + ")");
+  // TODO Add event support in js and check instace allocation and de allocation using that
 });
