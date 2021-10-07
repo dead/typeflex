@@ -1,3 +1,6 @@
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/YGStyle.h
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/YGStyle.cpp
+
 import {
     YGDirection,
     YGFlexDirection,
@@ -132,7 +135,7 @@ class YGStyle {
     }
 
     clone(): YGStyle {
-        let newStyle: YGStyle = new YGStyle();
+        const newStyle: YGStyle = new YGStyle();
         newStyle.direction = this.direction;
         newStyle.flexDirection = this.flexDirection;
         newStyle.justifyContent = this.justifyContent;

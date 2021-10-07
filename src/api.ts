@@ -1,3 +1,5 @@
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/javascript/sources/entry-common.js
+
 import {
     YGAlign,
     YGDimension,
@@ -108,7 +110,12 @@ import {
     YGNodeNewWithConfig,
     YGNodeNew,
     YGNodeStyleSetPosition,
-    YGNodeGetInstanceCount,
+    YGNodeSetIsReferenceBaseline,
+    YGNodeIsReferenceBaseline,
+    YGDirtiedFunc,
+    YGNodeSetDirtiedFunc,
+    YGNodeGetDirtiedFunc,
+    YGMeasureFunc,
 } from './yoga';
 
 import { YGNode } from './ygnode';
@@ -199,7 +206,7 @@ export class Size {
         }
     }
 
-    static fromJS(obj: { width: number; height: number }) {
+    static fromJS(obj: { width: number; height: number }): Size {
         return new Size(obj.width, obj.height);
     }
 }
@@ -230,7 +237,7 @@ export class Config {
         this.config = YGConfigNew();
     }
 
-    free() {
+    free(): void {
         YGConfigFree(this.config);
     }
 
@@ -238,12 +245,12 @@ export class Config {
         YGConfigSetExperimentalFeatureEnabled(this.config, feature, enabled);
     }
 
-    setPointScaleFactor(pixelsInPoint: number) {
+    setPointScaleFactor(pixelsInPoint: number): void {
         YGConfigSetPointScaleFactor(this.config, pixelsInPoint);
     }
 
-    isExperimentalFeatureEnabled(feature: number) {
-        YGConfigIsExperimentalFeatureEnabled(this.config, feature);
+    isExperimentalFeatureEnabled(feature: number): boolean {
+        return YGConfigIsExperimentalFeatureEnabled(this.config, feature);
     }
 }
 
@@ -258,7 +265,7 @@ function fromYGValue(val: YGValue): Value {
 export class Node {
     public node: YGNode;
 
-    static create(config?: Config) {
+    static create(config?: Config): Node {
         if (config) {
             return new Node(config);
         } else {
@@ -266,11 +273,11 @@ export class Node {
         }
     }
 
-    static createDefault() {
+    static createDefault(): Node {
         return new Node(undefined);
     }
 
-    static createWithConfig(config: Config) {
+    static createWithConfig(config: Config): Node {
         return new Node(config);
     }
 
@@ -456,6 +463,10 @@ export class Node {
         return fromYGValue(YGNodeStyleGetWidth(this.node));
     }
 
+    getDirtied(): YGDirtiedFunc {
+        return YGNodeGetDirtiedFunc(this.node);
+    }
+
     insertChild(child: Node, index: number): void {
         YGNodeInsertChild(this.node, child.node, index);
     }
@@ -617,7 +628,7 @@ export class Node {
         YGNodeStyleSetMaxWidthPercent(this.node, maxWidth);
     }
 
-    setMeasureFunc(measureFunc: any): void {
+    setMeasureFunc(measureFunc: YGMeasureFunc): void {
         if (measureFunc == null) {
             this.unsetMeasureFunc();
         } else {
@@ -625,7 +636,7 @@ export class Node {
         }
     }
 
-    unsetMeasureFunc() {
+    unsetMeasureFunc(): void {
         YGNodeSetMeasureFunc(this.node, null);
     }
 
@@ -723,11 +734,19 @@ export class Node {
         YGNodeStyleSetWidthPercent(this.node, width);
     }
 
+    setDirtiedFunc(dirtiedFunc: YGDirtiedFunc): void {
+        return YGNodeSetDirtiedFunc(this.node, dirtiedFunc);
+    }
+
     unsetMeasureFun(): void {
         YGNodeSetMeasureFunc(this.node, undefined);
     }
-}
 
-export function getInstanceCount(): number {
-    return YGNodeGetInstanceCount();
+    isReferenceBaseline(): boolean {
+        return YGNodeIsReferenceBaseline(this.node);
+    }
+
+    setIsReferenceBaseline(isReferenceBaseline: boolean): void {
+        YGNodeSetIsReferenceBaseline(this.node, isReferenceBaseline);
+    }
 }

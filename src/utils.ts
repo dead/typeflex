@@ -1,22 +1,25 @@
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/Utils.h
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/Utils.cpp
+
 import { YGUnit, YGFlexDirection, YGDirection } from './enums';
 
 import { YGFloatOptional } from './ygfloatoptional';
 
-import { YGFloatIsUndefined, YGUndefined } from './yoga';
+import { YGFloatIsUndefined } from './yoga';
 
 import { YGNode } from './ygnode';
 import { YGValue } from './ygvalue';
 
 export class YGCollectFlexItemsRowValues {
-    public itemsOnLine: number = 0;
-    public sizeConsumedOnCurrentLine: number = 0;
-    public totalFlexGrowFactors: number = 0;
-    public totalFlexShrinkScaledFactors: number = 0;
-    public endOfLineIndex: number = 0;
+    public itemsOnLine = 0;
+    public sizeConsumedOnCurrentLine = 0;
+    public totalFlexGrowFactors = 0;
+    public totalFlexShrinkScaledFactors = 0;
+    public endOfLineIndex = 0;
     public relativeChildren: Array<YGNode> = [];
-    public remainingFreeSpace: number = 0;
-    public mainDim: number = 0;
-    public crossDim: number = 0;
+    public remainingFreeSpace = 0;
+    public mainDim = 0;
+    public crossDim = 0;
 }
 
 export function YGValueEqual(a: YGValue, b: YGValue): boolean {
@@ -60,16 +63,16 @@ export function YGFloatMin(a: number, b: number): number {
     return YGFloatIsUndefined(a) ? b : a;
 }
 
-export function YGFloatArrayEqual(val1: Array<number>, val2: Array<number>) {
-    let areEqual: boolean = true;
+export function YGFloatArrayEqual(val1: Array<number>, val2: Array<number>): boolean {
+    let areEqual = true;
     for (let i = 0; i < val1.length && areEqual; ++i) {
         areEqual = YGFloatsEqual(val1[i], val2[i]);
     }
     return areEqual;
 }
 
-export function YGValueArrayEqual(val1: Array<YGValue>, val2: Array<YGValue>) {
-    let areEqual: boolean = true;
+export function YGValueArrayEqual(val1: Array<YGValue>, val2: Array<YGValue>): boolean {
+    let areEqual = true;
     for (let i = 0; i < val1.length && areEqual; ++i) {
         areEqual = YGValueEqual(val1[i], val2[i]);
     }
@@ -78,10 +81,6 @@ export function YGValueArrayEqual(val1: Array<YGValue>, val2: Array<YGValue>) {
 
 export function YGFloatSanitize(val: number): number {
     return YGFloatIsUndefined(val) ? 0 : val;
-}
-
-export function YGUnwrapFloatOptional(op: YGFloatOptional): number {
-    return op.isUndefined() ? YGUndefined : op.getValue();
 }
 
 export function YGFlexDirectionCross(flexDirection: YGFlexDirection, direction: YGDirection): YGFlexDirection {
@@ -96,15 +95,13 @@ export function YGFlexDirectionIsRow(flexDirection: YGFlexDirection): boolean {
 
 export function YGResolveValue(value: YGValue, ownerSize: number): YGFloatOptional {
     switch (value.unit) {
-        case YGUnit.Undefined:
-        case YGUnit.Auto:
-            return new YGFloatOptional();
         case YGUnit.Point:
             return new YGFloatOptional(value.value);
         case YGUnit.Percent:
             return new YGFloatOptional(value.value * ownerSize * 0.01);
+        default:
+            return new YGFloatOptional();
     }
-    return new YGFloatOptional();
 }
 
 export function YGFlexDirectionIsColumn(flexDirection: YGFlexDirection): boolean {
@@ -126,8 +123,12 @@ export function YGResolveValueMargin(value: YGValue, ownerSize: number): YGFloat
     return value.unit == YGUnit.Auto ? new YGFloatOptional(0) : YGResolveValue(value, ownerSize);
 }
 
+export function throwLogicalErrorWithMessage(message: string): void {
+    throw new Error(message);
+}
+
 export function cloneYGValueArray(array: Array<YGValue>): Array<YGValue> {
-    let ret = new Array(array.length);
+    const ret = new Array(array.length);
     for (let i = 0; i < array.length; i++) {
         ret[i] = array[i].clone();
     }

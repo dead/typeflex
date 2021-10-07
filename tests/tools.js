@@ -15,7 +15,7 @@ target.getMeasureCounter = function(Yoga, cb, staticWidth, staticHeight) {
   var counter = 0;
 
   return {
-    inc: function(width, widthMode, height, heightMode) {
+    inc: function(node, width, widthMode, height, heightMode) {
       counter += 1;
 
       return cb

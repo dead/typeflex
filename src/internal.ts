@@ -1,6 +1,6 @@
-import { YGMeasureMode, YGEdge, YGUnit, YGLogLevel, YGDimension } from './enums';
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/Yoga-internal.h
 
-import { YGNode } from './ygnode';
+import { YGMeasureMode, YGEdge, YGDimension } from './enums';
 
 import { YGFloatIsUndefined } from './yoga';
 
@@ -15,13 +15,13 @@ export class YGCachedMeasurement {
     constructor() {
         this.availableWidth = 0;
         this.availableHeight = 0;
-        this.widthMeasureMode = YGMeasureMode.AtMost;
-        this.heightMeasureMode = YGMeasureMode.AtMost;
+        this.widthMeasureMode = YGMeasureMode.Undefined;
+        this.heightMeasureMode = YGMeasureMode.Undefined;
         this.computedWidth = -1;
         this.computedHeight = -1;
     }
 
-    isEqual(measurement: YGCachedMeasurement) {
+    isEqual(measurement: YGCachedMeasurement): boolean {
         let isEqual =
             this.widthMeasureMode == measurement.widthMeasureMode &&
             this.heightMeasureMode == measurement.heightMeasureMode;
@@ -46,7 +46,7 @@ export class YGCachedMeasurement {
     }
 
     clone(): YGCachedMeasurement {
-        let newCached = new YGCachedMeasurement();
+        const newCached = new YGCachedMeasurement();
         newCached.availableWidth = this.availableWidth;
         newCached.availableHeight = this.availableHeight;
         newCached.widthMeasureMode = this.widthMeasureMode;
@@ -57,17 +57,32 @@ export class YGCachedMeasurement {
     }
 }
 
-export const leading: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
-export const trailing: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Bottom, YGEdge.Top, YGEdge.Right, YGEdge.Left];
-export const pos: [YGEdge, YGEdge, YGEdge, YGEdge] = [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right];
-export const dim: [YGDimension, YGDimension, YGDimension, YGDimension] = [
+export const leading: [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right] = [
+    YGEdge.Top,
+    YGEdge.Bottom,
+    YGEdge.Left,
+    YGEdge.Right,
+];
+export const trailing: [YGEdge.Bottom, YGEdge.Top, YGEdge.Right, YGEdge.Left] = [
+    YGEdge.Bottom,
+    YGEdge.Top,
+    YGEdge.Right,
+    YGEdge.Left,
+];
+export const pos: [YGEdge.Top, YGEdge.Bottom, YGEdge.Left, YGEdge.Right] = [
+    YGEdge.Top,
+    YGEdge.Bottom,
+    YGEdge.Left,
+    YGEdge.Right,
+];
+export const dim: [YGDimension.Height, YGDimension.Height, YGDimension.Width, YGDimension.Width] = [
     YGDimension.Height,
     YGDimension.Height,
     YGDimension.Width,
     YGDimension.Width,
 ];
 
-export const YG_MAX_CACHED_RESULT_COUNT: number = 16;
-export const kDefaultFlexGrow: number = 0.0;
-export const kDefaultFlexShrink: number = 0.0;
-export const kWebDefaultFlexShrink: number = 1.0;
+export const YG_MAX_CACHED_RESULT_COUNT = 16;
+export const kDefaultFlexGrow = 0.0;
+export const kDefaultFlexShrink = 0.0;
+export const kWebDefaultFlexShrink = 1.0;

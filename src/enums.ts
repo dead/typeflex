@@ -1,3 +1,6 @@
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/YGEnums.h
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/YGEnums.cpp
+
 export const YGAlignCount = 8;
 
 export enum YGAlign {
@@ -290,12 +293,15 @@ export function YGOverflowToString(value: YGOverflow): string {
 export const YGPositionTypeCount = 2;
 
 export enum YGPositionType {
+    Static,
     Relative,
     Absolute,
 }
 
 export function YGPositionTypeToString(value: YGPositionType): string {
     switch (value) {
+        case YGPositionType.Static:
+            return 'static';
         case YGPositionType.Relative:
             return 'relative';
         case YGPositionType.Absolute:
