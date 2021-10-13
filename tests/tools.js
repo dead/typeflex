@@ -1,11 +1,13 @@
 /**
- * Copyright (c) 2014-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
  * @format
  */
+
+// upstream: https://github.com/facebook/yoga/blob/342aebe1d73e5770a1862b6a94c6b877c1439a9b/javascript/tests/tools.js
 
 var target = typeof global !== 'undefined' ? global : window;
 
@@ -62,4 +64,30 @@ target.getMeasureCounterMin = function(Yoga) {
 
     return {width: measuredWidth, height: measuredHeight};
   });
+};
+
+/**
+ * deviation: Monkey-patch console.assert so execution stops and an error is thrown so
+ * failed assertions in tests can be accurately reported to the runner.
+ */
+
+class AssertionError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AssertionError";
+  }
+}
+
+console.assert = function (value, message, ...optionalParams) {
+  if (value) {
+    return;
+  }
+  if (console.assert.useDebugger) {
+    debugger;
+  }
+  const params = (optionalParams || []).join(" ");
+  if (params) {
+    message = (message || "") + " " + params;
+  }
+  throw new AssertionError(message || "");
 };

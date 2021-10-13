@@ -1,17 +1,20 @@
-import { 
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/YGNode.h
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/YGNode.cpp
+
+import {
     YGFlexDirection,
     YGDirection,
     YGNodeType,
     YGUnit,
     YGEdge,
     YGDimension,
-    YGDimensionCount,
     YGPositionType,
-    YGAlign
-} from "./enums";
+    YGAlign,
+    YGMeasureMode,
+} from './enums';
 
-import { YGFloatOptional } from "./ygfloatoptional";
-import { YGConfig } from "./ygconfig";
+import { YGFloatOptional } from './ygfloatoptional';
+import { YGConfig } from './ygconfig';
 
 import {
     YGFlexDirectionIsRow,
@@ -22,39 +25,27 @@ import {
     YGFlexDirectionCross,
     YGResolveFlexDirection,
     YGValueEqual,
-    YGUnwrapFloatOptional
-} from "./utils";
+} from './utils';
 
-import { YGLayout } from "./yglayout";
-import { YGStyle } from "./ygstyle";
-import { YGValue } from "./ygvalue";
+import { YGLayout } from './yglayout';
+import { YGStyle } from './ygstyle';
+import { YGValue } from './ygvalue';
 
-import {
-    trailing,
-    leading,
-    kDefaultFlexGrow,
-    kDefaultFlexShrink,
-    kWebDefaultFlexShrink
-} from "./internal";
+import { trailing, leading, kDefaultFlexGrow, kDefaultFlexShrink, kWebDefaultFlexShrink } from './internal';
 
-import {
-    YGComputedEdgeValue,
-    YGFloatIsUndefined,
-    YGPrintFunc,
-    YGMeasureFunc,
-    YGBaselineFunc,
-    YGDirtiedFunc,
-    YGCloneNodeFunc,
-    YGNodeClone,
-    YGValueUndefined,
-    YGValueZero,
-    YGValueAuto,
-} from "./yoga";
+import { YGPrintFunc, YGMeasureFunc, YGBaselineFunc, YGDirtiedFunc, YGSize, YGAssertWithNode } from './yoga';
+
+import { YGValueUndefined, YGValueZero, YGValueAuto } from './ygvalue';
+
+interface IterChildrenCallback {
+    (node: YGNode, cloneContext: any): void;
+}
 
 class YGNode {
     private context_: any;
     private print_: YGPrintFunc;
     private hasNewLayout_: boolean;
+    private isReferenceBaseline_: boolean;
     private nodeType_: YGNodeType;
     private measure_: YGMeasureFunc;
     private baseline_: YGBaselineFunc;
@@ -73,7 +64,7 @@ class YGNode {
             return this.getLeadingPosition(axis, axisSize);
         }
 
-        let trailingPosition: YGFloatOptional = this.getTrailingPosition(axis, axisSize);
+        const trailingPosition: YGFloatOptional = this.getTrailingPosition(axis, axisSize);
         if (!trailingPosition.isUndefined()) {
             trailingPosition.setValue(-1 * trailingPosition.getValue());
         }
@@ -83,31 +74,76 @@ class YGNode {
 
     constructor(node?: YGNode);
     constructor(config?: YGConfig);
-    constructor(contextOrNodeOrConfig: any|YGNode|YGConfig = null,
-                print: YGPrintFunc = null,
-                hasNewLayout: boolean = true,
-                nodeType: YGNodeType = YGNodeType.Default,
-                measure: YGMeasureFunc = null,
-                baseline: YGBaselineFunc = null,
-                dirtied: YGDirtiedFunc = null,
-                style: YGStyle = new YGStyle(),
-                layout: YGLayout = new YGLayout(),
-                lineIndex: number = 0,
-                owner: YGNode = null,
-                children: Array<YGNode> = [],
-                config: YGConfig = null,
-                isDirty: boolean = false,
-                resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined(), YGValueUndefined()]
-                ) {
-        
+    constructor(
+        contextOrNodeOrConfig: any | YGNode | YGConfig = null,
+        print: YGPrintFunc = null,
+        hasNewLayout = true,
+        isReferenceBaseline = false,
+        nodeType: YGNodeType = YGNodeType.Default,
+        measure: YGMeasureFunc = null,
+        baseline: YGBaselineFunc = null,
+        dirtied: YGDirtiedFunc = null,
+        style: YGStyle = new YGStyle(),
+        layout: YGLayout = new YGLayout(),
+        lineIndex = 0,
+        owner: YGNode = null,
+        children: Array<YGNode> = [],
+        config: YGConfig = null,
+        isDirty = false,
+        resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined(), YGValueUndefined()],
+    ) {
         if (contextOrNodeOrConfig instanceof YGNode) {
-            console.log('from node')
+            console.log('from node');
             this.fromNode(contextOrNodeOrConfig);
             return;
         }
 
+        this.initialize(
+            print,
+            hasNewLayout,
+            isReferenceBaseline,
+            nodeType,
+            measure,
+            baseline,
+            dirtied,
+            style,
+            layout,
+            lineIndex,
+            owner,
+            children,
+            config,
+            isDirty,
+            resolvedDimensions,
+        );
+
+        if (contextOrNodeOrConfig instanceof YGConfig) {
+            this.config_ = contextOrNodeOrConfig;
+            this.context_ = null;
+        } else {
+            this.context_ = contextOrNodeOrConfig;
+        }
+    }
+
+    initialize(
+        print: YGPrintFunc = null,
+        hasNewLayout = true,
+        isReferenceBaseline = false,
+        nodeType: YGNodeType = YGNodeType.Default,
+        measure: YGMeasureFunc = null,
+        baseline: YGBaselineFunc = null,
+        dirtied: YGDirtiedFunc = null,
+        style: YGStyle = new YGStyle(),
+        layout: YGLayout = new YGLayout(),
+        lineIndex = 0,
+        owner: YGNode = null,
+        children: Array<YGNode> = [],
+        config: YGConfig = null,
+        isDirty = false,
+        resolvedDimensions: [YGValue, YGValue] = [YGValueUndefined(), YGValueUndefined()],
+    ): void {
         this.print_ = print;
         this.hasNewLayout_ = hasNewLayout;
+        this.isReferenceBaseline_ = isReferenceBaseline;
         this.nodeType_ = nodeType;
         this.measure_ = measure;
         this.baseline_ = baseline;
@@ -120,13 +156,7 @@ class YGNode {
         this.config_ = config;
         this.isDirty_ = isDirty;
         this.resolvedDimensions_ = resolvedDimensions;
-
-        if (contextOrNodeOrConfig instanceof YGConfig) {
-            this.config_ = contextOrNodeOrConfig;
-            this.context_ = null;
-        } else {
-            this.context_ = contextOrNodeOrConfig;
-        }
+        this.context_ = null;
     }
 
     operatorAtrib(node: YGNode): YGNode {
@@ -141,10 +171,11 @@ class YGNode {
 
     fromNode(node: YGNode): void {
         console.log(node);
-        
+
         this.context_ = node.context_;
         this.print_ = node.print_;
         this.hasNewLayout_ = node.hasNewLayout_;
+        this.isReferenceBaseline_ = node.isReferenceBaseline_;
         this.nodeType_ = node.nodeType_;
         this.measure_ = node.measure_;
         this.baseline_ = node.baseline_;
@@ -169,16 +200,73 @@ class YGNode {
         this.config_ = node.config_;
         this.isDirty_ = node.isDirty_;
 
-        this.resolvedDimensions_ = node.resolvedDimensions_; // 
+        this.resolvedDimensions_ = node.resolvedDimensions_; //
         // this.resolvedDimensions_ = [node.resolvedDimensions_[0].clone(), node.resolvedDimensions_[1].clone()];
+    }
+
+    print(printContext?: any): void {
+        if (this.print_ != null) {
+            this.print_(this, printContext);
+        }
+    }
+
+    computeEdgeValueForRow(edges: Array<YGValue>, rowEdge: YGEdge, edge: YGEdge, defaultValue: YGValue): YGValue {
+        if (!edges[rowEdge].isUndefined()) {
+            return edges[rowEdge];
+        } else if (!edges[edge].isUndefined()) {
+            return edges[edge];
+        } else if (!edges[YGEdge.Horizontal].isUndefined()) {
+            return edges[YGEdge.Horizontal];
+        } else if (!edges[YGEdge.All].isUndefined()) {
+            return edges[YGEdge.All];
+        } else {
+            return defaultValue;
+        }
+    }
+
+    computeEdgeValueForColumn(edges: Array<YGValue>, edge: YGEdge, defaultValue: YGValue): YGValue {
+        if (!edges[edge].isUndefined()) {
+            return edges[edge];
+        } else if (!edges[YGEdge.Vertical].isUndefined()) {
+            return edges[YGEdge.Vertical];
+        } else if (!edges[YGEdge.All].isUndefined()) {
+            return edges[YGEdge.All];
+        } else {
+            return defaultValue;
+        }
+    }
+
+    measure(
+        width: number,
+        widthMode: YGMeasureMode,
+        height: number,
+        heightMode: YGMeasureMode,
+        layoutContext?: any,
+    ): YGSize {
+        return this.measure_(this, width, widthMode, height, heightMode, layoutContext);
+    }
+
+    baseline(width: number, height: number, layoutContext?: any): number {
+        return this.baseline_(this, width, height, layoutContext);
+    }
+
+    // TODO: Move useWebDefaults to the node and not the config?
+    useWebDefaults(): void {
+        this.config_.useWebDefaults = true;
+        this.style_.flexDirection = YGFlexDirection.Row;
+        this.style_.alignContent = YGAlign.Stretch;
+    }
+
+    hasMeasureFunc(): boolean {
+        return this.measure_ != null;
+    }
+
+    hasBaselineFunc(): boolean {
+        return this.baseline_ != null;
     }
 
     getContext(): any {
         return this.context_;
-    }
-
-    getPrintFunc(): YGPrintFunc {
-        return this.print_;
     }
 
     getHasNewLayout(): boolean {
@@ -187,14 +275,6 @@ class YGNode {
 
     getNodeType(): YGNodeType {
         return this.nodeType_;
-    }
-
-    getMeasure(): YGMeasureFunc {
-        return this.measure_;
-    }
-
-    getBaseline(): YGBaselineFunc {
-        return this.baseline_;
     }
 
     getDirtied(): YGDirtiedFunc {
@@ -211,6 +291,10 @@ class YGNode {
 
     getLineIndex(): number {
         return this.lineIndex_;
+    }
+
+    isReferenceBaseline(): boolean {
+        return this.isReferenceBaseline_;
     }
 
     getOwner(): YGNode {
@@ -250,101 +334,73 @@ class YGNode {
     }
 
     getLeadingPosition(axis: YGFlexDirection, axisSize: number): YGFloatOptional {
-        if (YGFlexDirectionIsRow(axis)) {
-            const leadingPosition: YGValue = YGComputedEdgeValue(this.style_.position, YGEdge.Start, YGValueUndefined());
-            if (leadingPosition.unit != YGUnit.Undefined) {
-                return YGResolveValue(leadingPosition, axisSize);
-            }
-        }
-
-        const leadingPosition: YGValue = YGComputedEdgeValue(this.style_.position, leading[axis], YGValueUndefined());
-        return leadingPosition.unit == YGUnit.Undefined ? new YGFloatOptional(0) : YGResolveValue(leadingPosition, axisSize);
+        const leadingPosition = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.position, YGEdge.Start, leading[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.position, leading[axis], YGValueZero());
+        return YGResolveValue(leadingPosition, axisSize);
     }
 
     isLeadingPositionDefined(axis: YGFlexDirection): boolean {
-        return (YGFlexDirectionIsRow(axis) && (YGComputedEdgeValue(this.style_.position, YGEdge.Start, YGValueUndefined())).unit != YGUnit.Undefined) ||
-               (YGComputedEdgeValue(this.style_.position, leading[axis], YGValueUndefined())).unit != YGUnit.Undefined;
+        const leadingPosition = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.position, YGEdge.Start, leading[axis], YGValueUndefined())
+            : this.computeEdgeValueForColumn(this.style_.position, leading[axis], YGValueUndefined());
+        return !leadingPosition.isUndefined();
     }
 
     isTrailingPosDefined(axis: YGFlexDirection): boolean {
-        return (YGFlexDirectionIsRow(axis) && (YGComputedEdgeValue(this.style_.position, YGEdge.End, YGValueUndefined())).unit != YGUnit.Undefined) ||
-               (YGComputedEdgeValue(this.style_.position, trailing[axis], YGValueUndefined())).unit != YGUnit.Undefined;
+        const trailingPosition = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.position, YGEdge.End, trailing[axis], YGValueUndefined())
+            : this.computeEdgeValueForColumn(this.style_.position, trailing[axis], YGValueUndefined());
+        return !trailingPosition.isUndefined();
     }
 
     getTrailingPosition(axis: YGFlexDirection, axisSize: number): YGFloatOptional {
-        if (YGFlexDirectionIsRow(axis)) {
-            const trailingPosition: YGValue = YGComputedEdgeValue(this.style_.position, YGEdge.End, YGValueUndefined());
-            if (trailingPosition.unit != YGUnit.Undefined) {
-                return YGResolveValue(trailingPosition, axisSize);
-            }
-        }
-
-        const trailingPosition: YGValue = YGComputedEdgeValue(this.style_.position, trailing[axis], YGValueUndefined());
-        return trailingPosition.unit == YGUnit.Undefined ? new YGFloatOptional(0) : YGResolveValue(trailingPosition, axisSize);
+        const trailingPosition = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.position, YGEdge.End, trailing[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.position, trailing[axis], YGValueZero());
+        return YGResolveValue(trailingPosition, axisSize);
     }
 
     getLeadingMargin(axis: YGFlexDirection, widthSize: number): YGFloatOptional {
-        if (YGFlexDirectionIsRow(axis) && this.style_.margin[YGEdge.Start].unit != YGUnit.Undefined) {
-            return YGResolveValueMargin(this.style_.margin[YGEdge.Start], widthSize);
-        }
-
-        return YGResolveValueMargin(YGComputedEdgeValue(this.style_.margin, leading[axis], YGValueZero()), widthSize);
+        const leadingMargin = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.margin, YGEdge.Start, leading[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.margin, leading[axis], YGValueZero());
+        return YGResolveValueMargin(leadingMargin, widthSize);
     }
 
     getTrailingMargin(axis: YGFlexDirection, widthSize: number): YGFloatOptional {
-        if (YGFlexDirectionIsRow(axis) && this.style_.margin[YGEdge.End].unit != YGUnit.Undefined) {
-            return YGResolveValueMargin(this.style_.margin[YGEdge.End], widthSize);
-        }
-
-        return YGResolveValueMargin(YGComputedEdgeValue(this.style_.margin, trailing[axis], YGValueZero()), widthSize);
+        const trailingMargin: YGValue = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.margin, YGEdge.End, trailing[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.margin, trailing[axis], YGValueZero());
+        return YGResolveValueMargin(trailingMargin, widthSize);
     }
 
     getLeadingBorder(axis: YGFlexDirection): number {
-        if (YGFlexDirectionIsRow(axis) &&
-            this.style_.border[YGEdge.Start].unit != YGUnit.Undefined &&
-            !YGFloatIsUndefined(this.style_.border[YGEdge.Start].value) &&
-            this.style_.border[YGEdge.Start].value >= 0.0) {
-            return this.style_.border[YGEdge.Start].value;
-        }
-
-        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, leading[axis], YGValueZero()).value;
-        return YGFloatMax(computedEdgeValue, 0.0);
+        const leadingBorder: YGValue = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.border, YGEdge.Start, leading[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.border, leading[axis], YGValueZero());
+        return YGFloatMax(leadingBorder.value, 0.0);
     }
 
     getTrailingBorder(axis: YGFlexDirection): number {
-        if (YGFlexDirectionIsRow(axis) &&
-            this.style_.border[YGEdge.End].unit != YGUnit.Undefined &&
-            !YGFloatIsUndefined(this.style_.border[YGEdge.End].value) &&
-            this.style_.border[YGEdge.End].value >= 0.0) {
-            return this.style_.border[YGEdge.End].value;
-        }
-
-        const computedEdgeValue: number = YGComputedEdgeValue(this.style_.border, trailing[axis], YGValueZero()).value;
-        return YGFloatMax(computedEdgeValue, 0.0);
+        const trailingBorder: YGValue = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.border, YGEdge.End, trailing[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.border, trailing[axis], YGValueZero());
+        return YGFloatMax(trailingBorder.value, 0.0);
     }
 
     getLeadingPadding(axis: YGFlexDirection, widthSize: number): YGFloatOptional {
-        const paddingEdgeStart: YGFloatOptional = YGResolveValue(this.style_.padding[YGEdge.Start], widthSize);
-        if (YGFlexDirectionIsRow(axis) &&
-            this.style_.padding[YGEdge.Start].unit != YGUnit.Undefined &&
-            !paddingEdgeStart.isUndefined() && paddingEdgeStart.getValue() > 0.0) {
-            return paddingEdgeStart;
-        }
-
-        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, leading[axis], YGValueZero()), widthSize);
-        return YGFloatOptionalMax(resolvedValue, new YGFloatOptional(0.0));
+        const leadingPadding = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.padding, YGEdge.Start, leading[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.padding, leading[axis], YGValueZero());
+        return YGFloatOptionalMax(YGResolveValue(leadingPadding, widthSize), new YGFloatOptional(0.0));
     }
 
     getTrailingPadding(axis: YGFlexDirection, widthSize: number): YGFloatOptional {
-        const paddingEdgeEnd: YGFloatOptional = YGResolveValue(this.style_.padding[YGEdge.End], widthSize);
-        if (YGFlexDirectionIsRow(axis) &&
-            this.style_.padding[YGEdge.End].unit != YGUnit.Undefined &&
-            !paddingEdgeEnd.isUndefined() && paddingEdgeEnd.getValue() >= 0.0) {
-            return paddingEdgeEnd;
-        }
-
-        const resolvedValue: YGFloatOptional = YGResolveValue(YGComputedEdgeValue(this.style_.padding, trailing[axis], YGValueZero()), widthSize);
-        return YGFloatOptionalMax(resolvedValue, new YGFloatOptional(0.0));
+        const trailingPadding = YGFlexDirectionIsRow(axis)
+            ? this.computeEdgeValueForRow(this.style_.padding, YGEdge.End, trailing[axis], YGValueZero())
+            : this.computeEdgeValueForColumn(this.style_.padding, trailing[axis], YGValueZero());
+        return YGFloatOptionalMax(YGResolveValue(trailingPadding, widthSize), new YGFloatOptional(0.0));
     }
 
     getLeadingPaddingAndBorder(axis: YGFlexDirection, widthSize: number): YGFloatOptional {
@@ -366,7 +422,7 @@ class YGNode {
     setPrintFunc(printFunc: YGPrintFunc): void {
         this.print_ = printFunc;
     }
-    
+
     setHasNewLayout(hasNewLayout: boolean): void {
         this.hasNewLayout_ = hasNewLayout;
     }
@@ -375,17 +431,20 @@ class YGNode {
         this.nodeType_ = nodeType;
     }
 
+    /**
+     * deviation: Upstream uses method overloading with a union for callbacks
+     * with and without context functions. TypeScript doesn't support method
+     * overloading in classes the same way C++ does, so the context function is
+     * made an optional parameter of YGMeasureFunc.
+     */
     setMeasureFunc(measureFunc: YGMeasureFunc): void {
         if (measureFunc == null) {
-            this.measure_ = null;
-            this.nodeType_ = YGNodeType.Default;
-        }
-        else {
+            this.setNodeType(YGNodeType.Default);
+        } else {
             //YGAssertWithNode(this, this.children_.size() == 0, "Cannot set measure function: Nodes with measure functions cannot have children.");
             if (this.children_.length != 0) {
-                console.error("Cannot set measure function: Nodes with measure functions cannot have children.");
+                console.error('Cannot set measure function: Nodes with measure functions cannot have children.');
             }
-            this.measure_ = measureFunc;
             this.setNodeType(YGNodeType.Text);
         }
 
@@ -412,12 +471,16 @@ class YGNode {
         this.style_.alignContent = alignContent;
     }
 
-    setLayout(layout: YGLayout) : void {
+    setLayout(layout: YGLayout): void {
         this.layout_ = layout;
     }
 
     setLineIndex(lineIndex: number): void {
         this.lineIndex_ = lineIndex;
+    }
+
+    setIsReferenceBaseline(isReferenceBaseline: boolean): void {
+        this.isReferenceBaseline_ = isReferenceBaseline;
     }
 
     setOwner(owner: YGNode): void {
@@ -433,7 +496,13 @@ class YGNode {
     }
 
     setDirty(isDirty: boolean): void {
+        if (isDirty == this.isDirty_) {
+            return;
+        }
         this.isDirty_ = isDirty;
+        if (isDirty && this.dirtied_) {
+            this.dirtied_(this);
+        }
     }
 
     setLayoutLastOwnerDirection(direction: YGDirection): void {
@@ -464,7 +533,7 @@ class YGNode {
         this.layout_.direction = direction;
     }
 
-    setLayoutMargin(margin: number , index: number): void {
+    setLayoutMargin(margin: number, index: number): void {
         this.layout_.margin[index] = margin;
     }
 
@@ -487,18 +556,22 @@ class YGNode {
         const relativePositionMain: YGFloatOptional = this.relativePosition(mainAxis, mainSize);
         const relativePositionCross: YGFloatOptional = this.relativePosition(crossAxis, crossSize);
 
-        this.setLayoutPosition(YGUnwrapFloatOptional(this.getLeadingMargin(mainAxis, ownerWidth).add(relativePositionMain)), leading[mainAxis]);
-        this.setLayoutPosition(YGUnwrapFloatOptional(this.getTrailingMargin(mainAxis, ownerWidth).add(relativePositionMain)), trailing[mainAxis]);
-        this.setLayoutPosition(YGUnwrapFloatOptional(this.getLeadingMargin(crossAxis, ownerWidth).add(relativePositionCross)), leading[crossAxis]);
-        this.setLayoutPosition(YGUnwrapFloatOptional(this.getTrailingMargin(crossAxis, ownerWidth).add(relativePositionCross)), trailing[crossAxis]);
-    }
-
-    setAndPropogateUseLegacyFlag(useLegacyFlag: boolean): void {
-        this.config_.useLegacyStretchBehaviour = useLegacyFlag;
-
-        for(let i = 0; i < this.children_.length; i++) {
-            this.children_[i].getConfig().useLegacyStretchBehaviour = useLegacyFlag;
-        }
+        this.setLayoutPosition(
+            this.getLeadingMargin(mainAxis, ownerWidth).add(relativePositionMain).unwrap(),
+            leading[mainAxis],
+        );
+        this.setLayoutPosition(
+            this.getTrailingMargin(mainAxis, ownerWidth).add(relativePositionMain).unwrap(),
+            trailing[mainAxis],
+        );
+        this.setLayoutPosition(
+            this.getLeadingMargin(crossAxis, ownerWidth).add(relativePositionCross).unwrap(),
+            leading[crossAxis],
+        );
+        this.setLayoutPosition(
+            this.getTrailingMargin(crossAxis, ownerWidth).add(relativePositionCross).unwrap(),
+            trailing[crossAxis],
+        );
     }
 
     setLayoutDoesLegacyFlagAffectsLayout(doesLegacyFlagAffectsLayout: boolean): void {
@@ -547,11 +620,15 @@ class YGNode {
     }
 
     resolveDimension(): void {
-        for (let dim = YGDimension.Width; dim < YGDimensionCount; ++dim) {
-            if (this.style_.maxDimensions[dim].unit != YGUnit.Undefined && YGValueEqual(this.style_.maxDimensions[dim], this.style_.minDimensions[dim])) {
-                this.resolvedDimensions_[dim] = this.style_.maxDimensions[dim];
+        const style: YGStyle = this.getStyle();
+        for (const dim of [YGDimension.Width, YGDimension.Height]) {
+            if (
+                !style.maxDimensions[dim].isUndefined() &&
+                YGValueEqual(style.maxDimensions[dim], style.minDimensions[dim])
+            ) {
+                this.resolvedDimensions_[dim] = style.maxDimensions[dim];
             } else {
-                this.resolvedDimensions_[dim] = this.style_.dimensions[dim];
+                this.resolvedDimensions_[dim] = style.dimensions[dim];
             }
         }
     }
@@ -600,33 +677,21 @@ class YGNode {
         this.children_.splice(index, 1);
     }
 
-    cloneChildrenIfNeeded(): void {
-        const childCount: number = this.children_.length;
-        if (childCount == 0) {
-            return;
-        }
-
-        const firstChild: YGNode = this.children_[0];
-        if (firstChild.getOwner() == this) {
-            return;
-        }
-
-        const cloneNodeCallback: YGCloneNodeFunc = this.config_.cloneNodeCallback;
-        for (let i: number = 0; i < childCount; ++i) {
-            const oldChild: YGNode = this.children_[i];
-            let newChild: YGNode = null;
-
-            if (cloneNodeCallback) {
-                newChild = cloneNodeCallback(oldChild, this, i);
+    iterChildrenAfterCloningIfNeeded(callback: IterChildrenCallback, cloneContext: any): void {
+        let i = 0;
+        for (let child of this.children_) {
+            if (child.getOwner() != this) {
+                child = this.config_.cloneNode(child, this, i, cloneContext);
+                child.setOwner(this);
             }
+            i += 1;
 
-            if (newChild == null) {
-                newChild = YGNodeClone(oldChild);
-            }
-
-            this.replaceChildIndex(newChild, i);
-            newChild.setOwner(this);
+            callback(child, cloneContext);
         }
+    }
+
+    cloneChildrenIfNeeded(cloneContext?: any): void {
+        this.iterChildrenAfterCloningIfNeeded((node: YGNode, cloneContext: any) => {}, cloneContext);
     }
 
     markDirtyAndPropogate(): void {
@@ -646,11 +711,11 @@ class YGNode {
         }
 
         if (!this.style_.flexGrow.isUndefined()) {
-            return this.style_.flexGrow.getValue();
+            return this.style_.flexGrow.unwrap();
         }
 
-        if (!this.style_.flex.isUndefined() && this.style_.flex.getValue() > 0.0) {
-            return this.style_.flex.getValue();
+        if (!this.style_.flex.isUndefined() && this.style_.flex.unwrap() > 0.0) {
+            return this.style_.flex.unwrap();
         }
 
         return kDefaultFlexGrow;
@@ -673,7 +738,10 @@ class YGNode {
     }
 
     isNodeFlexible(): boolean {
-        return ((this.style_.positionType == YGPositionType.Relative) && (this.resolveFlexGrow() != 0 || this.resolveFlexShrink() != 0));
+        return (
+            this.style_.positionType != YGPositionType.Absolute &&
+            (this.resolveFlexGrow() != 0 || this.resolveFlexShrink() != 0)
+        );
     }
 
     didUseLegacyFlag(): boolean {
@@ -682,7 +750,7 @@ class YGNode {
             return true;
         }
 
-        for (let i: number = 0; i < this.children_.length; i++) {
+        for (let i = 0; i < this.children_.length; i++) {
             if (this.children_[i].getLayout().didUseLegacyFlag) {
                 didUseLegacyFlag = true;
                 break;
@@ -705,8 +773,8 @@ class YGNode {
             return true;
         }
 
-        let isLayoutTreeEqual: boolean = true;
-        for (let i: number = 0; i < this.children_.length; ++i) {
+        let isLayoutTreeEqual = true;
+        for (let i = 0; i < this.children_.length; ++i) {
             const otherNodeChildren: YGNode = node.getChild(i);
             isLayoutTreeEqual = this.children_[i].isLayoutTreeEqualToNode(otherNodeChildren);
             if (!isLayoutTreeEqual) {
@@ -717,8 +785,23 @@ class YGNode {
         return isLayoutTreeEqual;
     }
 
+    reset(): void {
+        YGAssertWithNode(this, this.children_.length == 0, 'Cannot reset a node which still has children attached');
+        YGAssertWithNode(this, this.owner_ == null, 'Cannot reset a node still attached to a owner');
+
+        this.clearChildren();
+
+        // TODO: Move useWebDefaults to the node and not the config?
+        const config = this.getConfig();
+        const webDefaults = config.useWebDefaults;
+
+        this.initialize();
+        this.setConfig(config);
+
+        if (webDefaults) {
+            this.useWebDefaults();
+        }
+    }
 }
 
-export {
-    YGNode
-}
+export { YGNode };

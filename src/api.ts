@@ -1,3 +1,5 @@
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/javascript/sources/entry-common.js
+
 import {
     YGAlign,
     YGDimension,
@@ -13,8 +15,8 @@ import {
     YGOverflow,
     YGPositionType,
     YGUnit,
-    YGWrap
-} from "./enums";
+    YGWrap,
+} from './enums';
 
 import {
     YGNodeCalculateLayout,
@@ -108,13 +110,18 @@ import {
     YGNodeNewWithConfig,
     YGNodeNew,
     YGNodeStyleSetPosition,
-    YGNodeGetInstanceCount,
-} from "./yoga"
+    YGNodeSetIsReferenceBaseline,
+    YGNodeIsReferenceBaseline,
+    YGDirtiedFunc,
+    YGNodeSetDirtiedFunc,
+    YGNodeGetDirtiedFunc,
+    YGMeasureFunc,
+} from './yoga';
 
-import { YGNode } from "./ygnode"
-import { YGValue } from "./ygvalue"
-import { YGConfig } from "./ygconfig"
-import { YGFloatSanitize } from "./utils"
+import { YGNode } from './ygnode';
+import { YGValue } from './ygvalue';
+import { YGConfig } from './ygconfig';
+import { YGFloatSanitize } from './utils';
 
 export const ALIGN_AUTO = YGAlign.Auto;
 export const ALIGN_FLEX_START = YGAlign.FlexStart;
@@ -199,7 +206,7 @@ export class Size {
         }
     }
 
-    static fromJS(obj: {width: number, height: number}) {
+    static fromJS(obj: { width: number; height: number }): Size {
         return new Size(obj.width, obj.height);
     }
 }
@@ -227,10 +234,10 @@ export class Config {
     }
 
     constructor() {
-        this.config = YGConfigNew()
+        this.config = YGConfigNew();
     }
 
-    free() {
+    free(): void {
         YGConfigFree(this.config);
     }
 
@@ -238,48 +245,47 @@ export class Config {
         YGConfigSetExperimentalFeatureEnabled(this.config, feature, enabled);
     }
 
-    setPointScaleFactor(pixelsInPoint: number) {
+    setPointScaleFactor(pixelsInPoint: number): void {
         YGConfigSetPointScaleFactor(this.config, pixelsInPoint);
     }
 
-    isExperimentalFeatureEnabled(feature: number) {
-        YGConfigIsExperimentalFeatureEnabled(this.config, feature);
+    isExperimentalFeatureEnabled(feature: number): boolean {
+        return YGConfigIsExperimentalFeatureEnabled(this.config, feature);
     }
 }
 
 function fromYGNode(node: YGNode): Node {
-    return YGNodeGetContext(node) as Node
+    return YGNodeGetContext(node) as Node;
 }
 
 function fromYGValue(val: YGValue): Value {
-    return new Value(val.unit, val.value)
+    return new Value(val.unit, val.value);
 }
 
 export class Node {
     public node: YGNode;
 
-    static create(config?: Config) {
+    static create(config?: Config): Node {
         if (config) {
             return new Node(config);
-        }
-        else {
+        } else {
             return new Node();
         }
     }
 
-    static createDefault() {
+    static createDefault(): Node {
         return new Node(undefined);
     }
 
-    static createWithConfig(config: Config) {
-        return new Node(config)
+    static createWithConfig(config: Config): Node {
+        return new Node(config);
     }
 
     constructor(config?: Config) {
         if (!config) {
-            this.node = YGNodeNew()
+            this.node = YGNodeNew();
         } else {
-            this.node = YGNodeNewWithConfig(config.config)
+            this.node = YGNodeNewWithConfig(config.config);
         }
 
         YGNodeSetContext(this.node, this);
@@ -442,7 +448,7 @@ export class Node {
             return undefined;
         }
 
-        return fromYGNode(parent)
+        return fromYGNode(parent);
     }
 
     getPosition(edge: YGEdge): Value {
@@ -455,6 +461,10 @@ export class Node {
 
     getWidth(): Value {
         return fromYGValue(YGNodeStyleGetWidth(this.node));
+    }
+
+    getDirtied(): YGDirtiedFunc {
+        return YGNodeGetDirtiedFunc(this.node);
     }
 
     insertChild(child: Node, index: number): void {
@@ -542,8 +552,7 @@ export class Node {
         if (typeof height === 'string') {
             if (height === 'auto') {
                 this.setHeightAuto();
-            }
-            else if (height[height.length - 1] === '%') {
+            } else if (height[height.length - 1] === '%') {
                 this.setHeightPercent(parseFloat(height));
             } else {
                 throw new Error('Invalid input type.');
@@ -569,8 +578,7 @@ export class Node {
         if (typeof margin === 'string') {
             if (margin === 'auto') {
                 this.setMarginAuto(edge);
-            }
-            else if (margin[margin.length - 1] === '%') {
+            } else if (margin[margin.length - 1] === '%') {
                 this.setMarginPercent(edge, parseFloat(margin));
             } else {
                 throw new Error('Invalid input type.');
@@ -591,7 +599,7 @@ export class Node {
     setMaxHeight(maxHeight: number | string): void {
         if (typeof maxHeight === 'string') {
             if (maxHeight[maxHeight.length - 1] === '%') {
-                this.setMaxHeightPercent(parseFloat(maxHeight))
+                this.setMaxHeightPercent(parseFloat(maxHeight));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -607,7 +615,7 @@ export class Node {
     setMaxWidth(maxWidth: number | string): void {
         if (typeof maxWidth === 'string') {
             if (maxWidth[maxWidth.length - 1] === '%') {
-                this.setMaxWidthPercent(parseFloat(maxWidth))
+                this.setMaxWidthPercent(parseFloat(maxWidth));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -620,7 +628,7 @@ export class Node {
         YGNodeStyleSetMaxWidthPercent(this.node, maxWidth);
     }
 
-    setMeasureFunc(measureFunc: any): void {
+    setMeasureFunc(measureFunc: YGMeasureFunc): void {
         if (measureFunc == null) {
             this.unsetMeasureFunc();
         } else {
@@ -628,14 +636,14 @@ export class Node {
         }
     }
 
-    unsetMeasureFunc() {
+    unsetMeasureFunc(): void {
         YGNodeSetMeasureFunc(this.node, null);
     }
 
     setMinHeight(minHeight: number | string): void {
         if (typeof minHeight === 'string') {
             if (minHeight[minHeight.length - 1] === '%') {
-                this.setMinHeightPercent(parseFloat(minHeight))
+                this.setMinHeightPercent(parseFloat(minHeight));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -651,7 +659,7 @@ export class Node {
     setMinWidth(minWidth: number | string): void {
         if (typeof minWidth === 'string') {
             if (minWidth[minWidth.length - 1] === '%') {
-                this.setMinWidthPercent(parseFloat(minWidth))
+                this.setMinWidthPercent(parseFloat(minWidth));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -671,7 +679,7 @@ export class Node {
     setPadding(edge: YGEdge, padding: number | string): void {
         if (typeof padding === 'string') {
             if (padding[padding.length - 1] === '%') {
-                this.setPaddingPercent(edge, parseFloat(padding))
+                this.setPaddingPercent(edge, parseFloat(padding));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -687,7 +695,7 @@ export class Node {
     setPosition(edge: YGEdge, position: number | string): void {
         if (typeof position === 'string') {
             if (position[position.length - 1] === '%') {
-                this.setPositionPercent(edge, parseFloat(position))
+                this.setPositionPercent(edge, parseFloat(position));
             } else {
                 throw new Error('Invalid input type.');
             }
@@ -726,12 +734,19 @@ export class Node {
         YGNodeStyleSetWidthPercent(this.node, width);
     }
 
+    setDirtiedFunc(dirtiedFunc: YGDirtiedFunc): void {
+        return YGNodeSetDirtiedFunc(this.node, dirtiedFunc);
+    }
+
     unsetMeasureFun(): void {
         YGNodeSetMeasureFunc(this.node, undefined);
     }
-}
 
+    isReferenceBaseline(): boolean {
+        return YGNodeIsReferenceBaseline(this.node);
+    }
 
-export function getInstanceCount(): number {
-    return YGNodeGetInstanceCount()
+    setIsReferenceBaseline(isReferenceBaseline: boolean): void {
+        YGNodeSetIsReferenceBaseline(this.node, isReferenceBaseline);
+    }
 }

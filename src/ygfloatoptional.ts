@@ -1,12 +1,12 @@
-import {
-    YGFloatIsUndefined
-} from "./yoga";
+// upstream: https://github.com/facebook/yoga/blob/v1.19.0/yoga/YGFloatOptional.h
+
+import { YGFloatIsUndefined } from './yoga';
 
 class YGFloatOptional {
     private value_: number;
     private isUndefined_: boolean;
-    
-    constructor(value: number|YGFloatOptional = undefined) {
+
+    constructor(value: number | YGFloatOptional = undefined) {
         if (value instanceof YGFloatOptional) {
             this.value_ = value.getValue();
             this.isUndefined_ = value.isUndefined();
@@ -22,19 +22,23 @@ class YGFloatOptional {
         }
     }
 
+    unwrap(): number {
+        return !this.isUndefined_ ? this.value_ : NaN;
+    }
+
     clone(): YGFloatOptional {
-        return new YGFloatOptional(this.isUndefined_ ? undefined : this.value_)
+        return new YGFloatOptional(this.isUndefined_ ? undefined : this.value_);
     }
 
     getValue(): number {
         if (this.isUndefined_) {
-            throw "Tried to get value of an undefined YGFloatOptional";
+            throw 'Tried to get value of an undefined YGFloatOptional';
         }
 
         return this.value_;
     }
 
-    setValue(value: number) {
+    setValue(value: number): void {
         this.value_ = value;
         this.isUndefined_ = false;
     }
@@ -97,6 +101,4 @@ class YGFloatOptional {
     }
 }
 
-export {
-    YGFloatOptional
-}
+export { YGFloatOptional };
