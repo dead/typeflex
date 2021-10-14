@@ -1,6 +1,6 @@
 {
   "name": "typeflex",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Typescript implementation of CSS flexbox layout algorithm, a pure typescript port of Facebook's Yoga",
   "license": "MIT",
   "devDependencies": {
